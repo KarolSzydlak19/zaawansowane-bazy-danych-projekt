@@ -1,0 +1,214 @@
+{
+    "locations": {
+        "columns": [
+            {
+                "name": "id",
+                "type": "SERIAL"
+            },
+            {
+                "name": "name",
+                "type": "VARCHAR(100)"
+            },
+            {
+                "name": "address",
+                "type": "TEXT"
+            }
+        ]
+    },
+    "clients": {
+        "columns": [
+            {
+                "name": "id",
+                "type": "SERIAL"
+            },
+            {
+                "name": "full_name",
+                "type": "VARCHAR(100)"
+            },
+            {
+                "name": "email",
+                "type": "VARCHAR(100)"
+            },
+            {
+                "name": "phone",
+                "type": "VARCHAR(20)"
+            },
+            {
+                "name": "created_at",
+                "type": "TIMESTAMP"
+            }
+        ]
+    },
+    "bike_types": {
+        "columns": [
+            {
+                "name": "id",
+                "type": "SERIAL"
+            },
+            {
+                "name": "name",
+                "type": "VARCHAR(50)"
+            }
+        ]
+    },
+    "discounts": {
+        "columns": [
+            {
+                "name": "id",
+                "type": "SERIAL"
+            },
+            {
+                "name": "name",
+                "type": "VARCHAR(100)"
+            },
+            {
+                "name": "description",
+                "type": "TEXT"
+            },
+            {
+                "name": "percentage",
+                "type": "NUMERIC(5"
+            },
+            {
+                "name": "2)",
+                "type": "NOT"
+            },
+            {
+                "name": "valid_from",
+                "type": "DATE"
+            },
+            {
+                "name": "valid_to",
+                "type": "DATE"
+            }
+        ]
+    },
+    "bikes": {
+        "columns": [
+            {
+                "name": "id",
+                "type": "SERIAL"
+            },
+            {
+                "name": "model",
+                "type": "VARCHAR(100)"
+            },
+            {
+                "name": "type_id",
+                "type": "INT"
+            },
+            {
+                "name": "location_id",
+                "type": "INT"
+            },
+            {
+                "name": "status",
+                "type": "VARCHAR(20)"
+            },
+            {
+                "name": "daily_price",
+                "type": "NUMERIC(10"
+            },
+            {
+                "name": "2)",
+                "type": "NOT"
+            }
+        ]
+    },
+    "rentals": {
+        "columns": [
+            {
+                "name": "id",
+                "type": "SERIAL"
+            },
+            {
+                "name": "client_id",
+                "type": "INT"
+            },
+            {
+                "name": "bike_id",
+                "type": "INT"
+            },
+            {
+                "name": "rental_start",
+                "type": "TIMESTAMP"
+            },
+            {
+                "name": "rental_end",
+                "type": "TIMESTAMP"
+            },
+            {
+                "name": "total_price",
+                "type": "NUMERIC(10"
+            },
+            {
+                "name": "location_pickup_id",
+                "type": "INT"
+            },
+            {
+                "name": "location_dropoff_id",
+                "type": "INT"
+            },
+            {
+                "name": "discount_id",
+                "type": "INT"
+            },
+            {
+                "name": "status",
+                "type": "VARCHAR(20)"
+            }
+        ]
+    },
+    "maintenance_logs": {
+        "columns": [
+            {
+                "name": "id",
+                "type": "SERIAL"
+            },
+            {
+                "name": "bike_id",
+                "type": "INT"
+            },
+            {
+                "name": "description",
+                "type": "TEXT"
+            },
+            {
+                "name": "maintenance_date",
+                "type": "TIMESTAMP"
+            }
+        ]
+    },
+    "bike_accessories": {
+        "columns": [
+            {
+                "name": "id",
+                "type": "SERIAL"
+            },
+            {
+                "name": "name",
+                "type": "VARCHAR(100)"
+            },
+            {
+                "name": "daily_price",
+                "type": "NUMERIC(10"
+            }
+        ]
+    },
+    "rental_accessories": {
+        "columns": [
+            {
+                "name": "rental_id",
+                "type": "INT"
+            },
+            {
+                "name": "accessory_id",
+                "type": "INT"
+            },
+            {
+                "name": "quantity",
+                "type": "INT"
+            }
+        ]
+    }
+}
