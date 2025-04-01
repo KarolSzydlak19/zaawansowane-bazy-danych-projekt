@@ -46,5 +46,3 @@ def parse_schema(filename):
 parsed_schema = parse_schema("../init.sql")
 with open("parsed_schema.json", "w") as f:
     json.dump(parsed_schema, f, indent=4)
-
-print("✅ Schema parsed and saved as JSON!")
