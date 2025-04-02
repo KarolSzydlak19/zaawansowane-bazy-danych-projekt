@@ -12,18 +12,41 @@ def read_schema(filename):
         schema = file.read()
     return schema
 
+def split_line(s):
+    parts = []
+    current = []
+    depth = 0
+
+    for char in s:
+        if char == '(':
+            depth += 1
+        elif char == ')':
+            depth -= 1
+        if char == ',' and depth == 0:
+            parts.append(''.join(current).strip())
+            current = []
+        else:
+            current.append(char)
+
+    if current:
+        parts.append(''.join(current).strip())
+
+    return parts
+
 def extract_columns(token_list):
     columns = []
     for token in token_list:
         if isinstance(token, Parenthesis):
             inside = token.value[1:-1]
-            lines = [line.strip() for line in inside.split(",") if line.strip()]
+            lines = split_line(inside) #[line.strip() for line in inside.split(",") if line.strip()]
             for line in lines:
                 parts = line.split()
                 if len(parts) >= 2 and not parts[0].upper() in ('PRIMARY', 'FOREIGN', 'CONSTRAINT'):
                     col_name = parts[0]
                     col_type = parts[1].upper()
-                    columns.append({"name": col_name, "type": col_type})
+                    constraint = parts[2:]
+                    column_data = col_type + ' ' + " ".join(constraint)
+                    columns.append({"name": col_name, "type": column_data})
     return columns
 
 def parse_schema(filename):
@@ -46,5 +69,3 @@ def parse_schema(filename):
 parsed_schema = parse_schema("../init.sql")
 with open("parsed_schema.json", "w") as f:
     json.dump(parsed_schema, f, indent=4)
-
-print("✅ Schema parsed and saved as JSON!")

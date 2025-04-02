@@ -3,15 +3,15 @@
         "columns": [
             {
                 "name": "id",
-                "type": "SERIAL"
+                "type": "SERIAL PRIMARY KEY"
             },
             {
                 "name": "name",
-                "type": "VARCHAR(100)"
+                "type": "VARCHAR(100) NOT NULL"
             },
             {
                 "name": "address",
-                "type": "TEXT"
+                "type": "TEXT NOT NULL"
             }
         ]
     },
@@ -19,23 +19,23 @@
         "columns": [
             {
                 "name": "id",
-                "type": "SERIAL"
+                "type": "SERIAL PRIMARY KEY"
             },
             {
                 "name": "full_name",
-                "type": "VARCHAR(100)"
+                "type": "VARCHAR(100) NOT NULL"
             },
             {
                 "name": "email",
-                "type": "VARCHAR(100)"
+                "type": "VARCHAR(100) UNIQUE NOT NULL"
             },
             {
                 "name": "phone",
-                "type": "VARCHAR(20)"
+                "type": "VARCHAR(20) "
             },
             {
                 "name": "created_at",
-                "type": "TIMESTAMP"
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
             }
         ]
     },
@@ -43,11 +43,11 @@
         "columns": [
             {
                 "name": "id",
-                "type": "SERIAL"
+                "type": "SERIAL PRIMARY KEY"
             },
             {
                 "name": "name",
-                "type": "VARCHAR(50)"
+                "type": "VARCHAR(50) NOT NULL"
             }
         ]
     },
@@ -55,31 +55,27 @@
         "columns": [
             {
                 "name": "id",
-                "type": "SERIAL"
+                "type": "SERIAL PRIMARY KEY"
             },
             {
                 "name": "name",
-                "type": "VARCHAR(100)"
+                "type": "VARCHAR(100) NOT NULL"
             },
             {
                 "name": "description",
-                "type": "TEXT"
+                "type": "TEXT "
             },
             {
                 "name": "percentage",
-                "type": "NUMERIC(5"
-            },
-            {
-                "name": "2)",
-                "type": "NOT"
+                "type": "NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100)"
             },
             {
                 "name": "valid_from",
-                "type": "DATE"
+                "type": "DATE "
             },
             {
                 "name": "valid_to",
-                "type": "DATE"
+                "type": "DATE "
             }
         ]
     },
@@ -87,31 +83,27 @@
         "columns": [
             {
                 "name": "id",
-                "type": "SERIAL"
+                "type": "SERIAL PRIMARY KEY"
             },
             {
                 "name": "model",
-                "type": "VARCHAR(100)"
+                "type": "VARCHAR(100) NOT NULL"
             },
             {
                 "name": "type_id",
-                "type": "INT"
+                "type": "INT REFERENCES bike_types(id)"
             },
             {
                 "name": "location_id",
-                "type": "INT"
+                "type": "INT REFERENCES locations(id)"
             },
             {
                 "name": "status",
-                "type": "VARCHAR(20)"
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'available'"
             },
             {
                 "name": "daily_price",
-                "type": "NUMERIC(10"
-            },
-            {
-                "name": "2)",
-                "type": "NOT"
+                "type": "NUMERIC(10, 2) NOT NULL"
             }
         ]
     },
@@ -119,43 +111,43 @@
         "columns": [
             {
                 "name": "id",
-                "type": "SERIAL"
+                "type": "SERIAL PRIMARY KEY"
             },
             {
                 "name": "client_id",
-                "type": "INT"
+                "type": "INT REFERENCES clients(id)"
             },
             {
                 "name": "bike_id",
-                "type": "INT"
+                "type": "INT REFERENCES bikes(id)"
             },
             {
                 "name": "rental_start",
-                "type": "TIMESTAMP"
+                "type": "TIMESTAMP NOT NULL"
             },
             {
                 "name": "rental_end",
-                "type": "TIMESTAMP"
+                "type": "TIMESTAMP "
             },
             {
                 "name": "total_price",
-                "type": "NUMERIC(10"
+                "type": "NUMERIC(10, 2)"
             },
             {
                 "name": "location_pickup_id",
-                "type": "INT"
+                "type": "INT REFERENCES locations(id)"
             },
             {
                 "name": "location_dropoff_id",
-                "type": "INT"
+                "type": "INT REFERENCES locations(id)"
             },
             {
                 "name": "discount_id",
-                "type": "INT"
+                "type": "INT REFERENCES discounts(id)"
             },
             {
                 "name": "status",
-                "type": "VARCHAR(20)"
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'active'"
             }
         ]
     },
@@ -163,19 +155,19 @@
         "columns": [
             {
                 "name": "id",
-                "type": "SERIAL"
+                "type": "SERIAL PRIMARY KEY"
             },
             {
                 "name": "bike_id",
-                "type": "INT"
+                "type": "INT REFERENCES bikes(id)"
             },
             {
                 "name": "description",
-                "type": "TEXT"
+                "type": "TEXT NOT NULL"
             },
             {
                 "name": "maintenance_date",
-                "type": "TIMESTAMP"
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
             }
         ]
     },
@@ -183,15 +175,15 @@
         "columns": [
             {
                 "name": "id",
-                "type": "SERIAL"
+                "type": "SERIAL PRIMARY KEY"
             },
             {
                 "name": "name",
-                "type": "VARCHAR(100)"
+                "type": "VARCHAR(100) NOT NULL"
             },
             {
                 "name": "daily_price",
-                "type": "NUMERIC(10"
+                "type": "NUMERIC(10, 2)"
             }
         ]
     },
@@ -199,15 +191,15 @@
         "columns": [
             {
                 "name": "rental_id",
-                "type": "INT"
+                "type": "INT REFERENCES rentals(id)"
             },
             {
                 "name": "accessory_id",
-                "type": "INT"
+                "type": "INT REFERENCES bike_accessories(id)"
             },
             {
                 "name": "quantity",
-                "type": "INT"
+                "type": "INT DEFAULT 1"
             }
         ]
     }
