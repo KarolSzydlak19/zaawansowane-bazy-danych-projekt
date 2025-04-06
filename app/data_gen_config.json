@@ -4,10 +4,20 @@
             "name": [
                 {
                     "name": "Wroclaw",
-                    "type": "TERXT"
+                    "type": "TEXT"
                 },
                 {
                     "name": "Klodzko",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "Poznań",
+                    "type": "TEXT"
+                }
+            ],
+            "address": [
+                {
+                    "name": "Wybrzeże Stanisława Wyspiańskiego",
                     "type": "TEXT"
                 }
             ]
@@ -67,7 +77,7 @@
                     "type": "TEXT"
                 },
                 {
-                    "name": "lights",
+                    "name": "Lights",
                     "type": "TEXT"
                 }
             ]

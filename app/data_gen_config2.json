@@ -1,0 +1,210 @@
+{
+    "locations": {
+      "columns": {
+        "name": {
+          "values":[
+            {
+                "name": "Wroclaw",
+                "type": "TEXT"
+            },
+            {
+                "name": "Klodzko",
+                "type": "TEXT"
+            },
+            {
+                "name": "Poznań",
+                "type": "TEXT"
+            }
+          ]
+        },
+        "address": {
+          "type": "TEXT NOT NULL",
+          "provider": "address"
+        }
+      }
+    },
+    "clients": {
+      "columns": {
+        "full_name": {
+          "type": "VARCHAR(100) NOT NULL",
+          "provider": "name"
+        },
+        "email": {
+          "type": "VARCHAR(100) UNIQUE NOT NULL",
+          "provider": "email"
+        },
+        "phone": {
+          "type": "VARCHAR(20)",
+          "provider": "phone_number"
+        },
+        "created_at": {
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "provider": "date_time_this_year"
+        }
+      }
+    },
+    "bike_types": {
+      "columns": {
+        "name": {
+          "values":[
+              {
+                "name": "A cool Kross",
+                "type": "TEXT"
+            },
+            {
+                "name": "A very cool Merida MTB bikde",
+                "type": "TEXT"
+            }
+          ]
+        }
+      }
+    },
+    "discounts": {
+      "columns": {
+        "name": {
+          "type": "VARCHAR(100) NOT NULL",
+          "provider": "name"
+        },
+        "description": {
+          "type": "TEXT",
+          "provider": "sentence"
+        },
+        "percentage": {
+          "type": "NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100)",
+          "provider": "pyfloat"
+        },
+        "valid_from": {
+          "type": "DATE",
+          "provider": "date_this_decade"
+        },
+        "valid_to": {
+          "type": "DATE",
+          "provider": "date_this_decade"
+        }
+      }
+    },
+    "bikes": {
+      "columns": {
+        "model": {
+          "type": "VARCHAR(100) NOT NULL",
+          "provider": "word"
+        },
+        "type_id": {
+          "type": "INT REFERENCES bike_types(id)"
+        },
+        "location_id": {
+          "type": "INT REFERENCES locations(id)"
+        },
+        "status": {
+          "type": "VARCHAR(20) NOT NULL DEFAULT 'available'",
+          "values": [
+            {
+              "name": "active",
+              "type": "TEXT"
+            },
+            {
+              "name": "disabled",
+              "type": "TEXT"
+            },
+            {
+              "name": "available",
+              "type": "TEXT"
+            }
+          ]
+        },
+        "daily_price": {
+          "type": "NUMERIC(10, 2) NOT NULL",
+          "provider": "pyfloat"
+        }
+      }
+    },
+    "rentals": {
+      "columns": {
+        "client_id": {
+          "type": "INT REFERENCES clients(id)"
+        },
+        "bike_id": {
+          "type": "INT REFERENCES bikes(id)"
+        },
+        "rental_start": {
+          "type": "TIMESTAMP NOT NULL",
+          "provider": "date_time_this_year"
+        },
+        "rental_end": {
+          "type": "TIMESTAMP",
+          "provider": "date_time_this_year"
+        },
+        "total_price": {
+          "type": "NUMERIC(10, 2)",
+          "provider": "pyfloat"
+        },
+        "location_pickup_id": {
+          "type": "INT REFERENCES locations(id)"
+        },
+        "location_dropoff_id": {
+          "type": "INT REFERENCES locations(id)"
+        },
+        "discount_id": {
+          "type": "INT REFERENCES discounts(id)"
+        },
+        "status": {
+          "type": "VARCHAR(20) NOT NULL DEFAULT 'active'",
+          "values": [
+            {
+              "name": "active",
+              "type": "TEXT"
+            },
+            {
+              "name": "disabled",
+              "type": "TEXT"
+            },
+            {
+              "name": "available",
+              "type": "TEXT"
+            }
+          ]
+        }
+      }
+    },
+    "maintenance_logs": {
+      "columns": {
+        "bike_id": {
+          "type": "INT REFERENCES bikes(id)"
+        },
+        "description": {
+          "type": "TEXT NOT NULL",
+          "provider": "sentence"
+        },
+        "maintenance_date": {
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        }
+      }
+    },
+    "bike_accessories": {
+      "columns": {
+        "name": {
+          "type": "VARCHAR(100) NOT NULL",
+          "provider": "name"
+        },
+        "daily_price": {
+          "type": "NUMERIC(10, 2)",
+          "provider": "pyfloat"
+        }
+      }
+    },
+    "rental_accessories": {
+      "columns": {
+        "rental_id": {
+          "type": "INT REFERENCES rentals(id)"
+        },
+        "accessory_id": {
+          "type": "INT REFERENCES bike_accessories(id)"
+        },
+        "quantity": {
+          "type": "INT DEFAULT 1",
+          "provider": "random_int"
+        }
+      }
+    }
+  }
+  
