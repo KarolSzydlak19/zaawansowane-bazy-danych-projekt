@@ -1,7 +1,7 @@
 -- Table: locations
 CREATE TABLE locations (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    city VARCHAR(100) NOT NULL,
     address TEXT NOT NULL
 );
 

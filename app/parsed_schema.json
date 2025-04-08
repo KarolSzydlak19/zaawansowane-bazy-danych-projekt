@@ -1,214 +1,206 @@
 {
     "locations": {
-        "columns": [
-            {
-                "name": "id",
-                "type": "SERIAL"
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
             },
-            {
-                "name": "name",
-                "type": "VARCHAR(100)"
+            "city": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": "city"
             },
-            {
-                "name": "address",
-                "type": "TEXT"
+            "address": {
+                "type": "TEXT NOT NULL",
+                "provider": "street_address"
             }
-        ]
+        }
     },
     "clients": {
-        "columns": [
-            {
-                "name": "id",
-                "type": "SERIAL"
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
             },
-            {
-                "name": "full_name",
-                "type": "VARCHAR(100)"
+            "full_name": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": "name"
             },
-            {
-                "name": "email",
-                "type": "VARCHAR(100)"
+            "email": {
+                "type": "VARCHAR(100) UNIQUE NOT NULL",
+                "provider": "email"
             },
-            {
-                "name": "phone",
-                "type": "VARCHAR(20)"
+            "phone": {
+                "type": "VARCHAR(20) ",
+                "provider": "phone_number"
             },
-            {
-                "name": "created_at",
-                "type": "TIMESTAMP"
+            "created_at": {
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+                "provider": "date_time_this_year"
             }
-        ]
+        }
     },
     "bike_types": {
-        "columns": [
-            {
-                "name": "id",
-                "type": "SERIAL"
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
             },
-            {
-                "name": "name",
-                "type": "VARCHAR(50)"
+            "name": {
+                "type": "VARCHAR(50) NOT NULL",
+                "provider": "word"
             }
-        ]
+        }
     },
     "discounts": {
-        "columns": [
-            {
-                "name": "id",
-                "type": "SERIAL"
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
             },
-            {
-                "name": "name",
-                "type": "VARCHAR(100)"
+            "name": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": "word"
             },
-            {
-                "name": "description",
-                "type": "TEXT"
+            "description": {
+                "type": "TEXT ",
+                "provider": "word"
             },
-            {
-                "name": "percentage",
-                "type": "NUMERIC(5"
+            "percentage": {
+                "type": "NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100)",
+                "provider": "word"
             },
-            {
-                "name": "2)",
-                "type": "NOT"
+            "valid_from": {
+                "type": "DATE ",
+                "provider": "word"
             },
-            {
-                "name": "valid_from",
-                "type": "DATE"
-            },
-            {
-                "name": "valid_to",
-                "type": "DATE"
+            "valid_to": {
+                "type": "DATE ",
+                "provider": "word"
             }
-        ]
+        }
     },
     "bikes": {
-        "columns": [
-            {
-                "name": "id",
-                "type": "SERIAL"
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
             },
-            {
-                "name": "model",
-                "type": "VARCHAR(100)"
+            "model": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": "word"
             },
-            {
-                "name": "type_id",
-                "type": "INT"
+            "type_id": {
+                "type": "INT REFERENCES bike_types(id)",
+                "provider": "word"
             },
-            {
-                "name": "location_id",
-                "type": "INT"
+            "location_id": {
+                "type": "INT REFERENCES locations(id)",
+                "provider": "word"
             },
-            {
-                "name": "status",
-                "type": "VARCHAR(20)"
+            "status": {
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'available'",
+                "provider": "word"
             },
-            {
-                "name": "daily_price",
-                "type": "NUMERIC(10"
-            },
-            {
-                "name": "2)",
-                "type": "NOT"
+            "daily_price": {
+                "type": "NUMERIC(10, 2) NOT NULL",
+                "provider": "pyfloat"
             }
-        ]
+        }
     },
     "rentals": {
-        "columns": [
-            {
-                "name": "id",
-                "type": "SERIAL"
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
             },
-            {
-                "name": "client_id",
-                "type": "INT"
+            "client_id": {
+                "type": "INT REFERENCES clients(id)",
+                "provider": "word"
             },
-            {
-                "name": "bike_id",
-                "type": "INT"
+            "bike_id": {
+                "type": "INT REFERENCES bikes(id)",
+                "provider": "word"
             },
-            {
-                "name": "rental_start",
-                "type": "TIMESTAMP"
+            "rental_start": {
+                "type": "TIMESTAMP NOT NULL",
+                "provider": "word"
             },
-            {
-                "name": "rental_end",
-                "type": "TIMESTAMP"
+            "rental_end": {
+                "type": "TIMESTAMP ",
+                "provider": "word"
             },
-            {
-                "name": "total_price",
-                "type": "NUMERIC(10"
+            "total_price": {
+                "type": "NUMERIC(10, 2)",
+                "provider": "pyfloat"
             },
-            {
-                "name": "location_pickup_id",
-                "type": "INT"
+            "location_pickup_id": {
+                "type": "INT REFERENCES locations(id)",
+                "provider": "word"
             },
-            {
-                "name": "location_dropoff_id",
-                "type": "INT"
+            "location_dropoff_id": {
+                "type": "INT REFERENCES locations(id)",
+                "provider": "word"
             },
-            {
-                "name": "discount_id",
-                "type": "INT"
+            "discount_id": {
+                "type": "INT REFERENCES discounts(id)",
+                "provider": "word"
             },
-            {
-                "name": "status",
-                "type": "VARCHAR(20)"
+            "status": {
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'active'",
+                "provider": "word"
             }
-        ]
+        }
     },
     "maintenance_logs": {
-        "columns": [
-            {
-                "name": "id",
-                "type": "SERIAL"
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
             },
-            {
-                "name": "bike_id",
-                "type": "INT"
+            "bike_id": {
+                "type": "INT REFERENCES bikes(id)",
+                "provider": "word"
             },
-            {
-                "name": "description",
-                "type": "TEXT"
+            "description": {
+                "type": "TEXT NOT NULL",
+                "provider": "word"
             },
-            {
-                "name": "maintenance_date",
-                "type": "TIMESTAMP"
+            "maintenance_date": {
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+                "provider": "date_time_this_year"
             }
-        ]
+        }
     },
     "bike_accessories": {
-        "columns": [
-            {
-                "name": "id",
-                "type": "SERIAL"
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
             },
-            {
-                "name": "name",
-                "type": "VARCHAR(100)"
+            "name": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": "word"
             },
-            {
-                "name": "daily_price",
-                "type": "NUMERIC(10"
+            "daily_price": {
+                "type": "NUMERIC(10, 2)",
+                "provider": "pyfloat"
             }
-        ]
+        }
     },
     "rental_accessories": {
-        "columns": [
-            {
-                "name": "rental_id",
-                "type": "INT"
+        "columns": {
+            "rental_id": {
+                "type": "INT REFERENCES rentals(id)",
+                "provider": "word"
             },
-            {
-                "name": "accessory_id",
-                "type": "INT"
+            "accessory_id": {
+                "type": "INT REFERENCES bike_accessories(id)",
+                "provider": "word"
             },
-            {
-                "name": "quantity",
-                "type": "INT"
+            "quantity": {
+                "type": "INT DEFAULT 1",
+                "provider": "word"
             }
-        ]
+        }
     }
 }
