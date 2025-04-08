@@ -36,7 +36,7 @@ def split_line(s):
     return parts
 
 def extract_columns(token_list):
-    columns = []
+    columns = {}
     for token in token_list:
         if isinstance(token, Parenthesis):
             inside = token.value[1:-1]
@@ -48,7 +48,12 @@ def extract_columns(token_list):
                     col_type = parts[1].upper()
                     constraint = parts[2:]
                     column_data = col_type + ' ' + " ".join(constraint)
-                    columns.append({"name": col_name, "type": column_data})
+                    provider = guess_provider(col_name)
+                    #columns.append({"name": col_name, "type": column_data, "provider": provider})
+                    columns[col_name] = {
+                        "type" : column_data,
+                        "provider": provider
+                    }
     return columns
 
 def parse_schema(filename):
@@ -80,28 +85,33 @@ def build_dependency_graph(tables):
     all_tables = set(tables.keys())
     
     for table_name, table_data in tables.items():
-        for column in table_data.get("columns", []):
-            ref = extract_references(column["type"])
+        columns = table_data.get("columns", {})
+        for column_name, column_data in columns.items():
+            col_type = column_data.get("type", "")
+            ref = extract_references(col_type)
             if ref:
                 referenced_table = ref[0]
                 if referenced_table in all_tables:
                     graph[table_name].add(referenced_table)
 
-    for key in graph:
-        print(f"{key}: {graph[key]}")
+    #for key in graph:
+        #print(f"{key}: {graph[key]}")
     return graph
 
 def topological_sort(tables):
     graph = build_dependency_graph(tables)
     num_dependencies = {table: 0 for table in tables}
+    all_tables = []
+    for table in tables:
+        all_tables.append(table)
     
     for table, deps in graph.items():
         for dep in deps:
             num_dependencies[table] += 1
     queue = deque([table for table, dep in num_dependencies.items() if dep == 0])
-    
     while graph:
-        if detect_cycles:
+        if detect_cycles(graph, table):
+            print("cycle")
             break
         queue_c = deque(queue)
         for table in queue_c:
@@ -144,6 +154,24 @@ def print_generation_order_with_dependencies(tables):
             print(f" - {table} (depends on: {dep_list})")
         else:
             print(f" - {table} (no dependencies)")
+
+def guess_provider(column_name):
+    name = column_name.lower()
+    if "email" in name:
+        return "email"
+    if "name" in name and "full" in name:
+        return "name"
+    if "phone" in name:
+        return "phone_number"
+    if "address" in name:
+        return "street_address"
+    if "city" in name:
+        return "city"
+    if "created" in name or "date" in name:
+        return "date_time_this_year"
+    if "price" in name:
+        return "pyfloat"
+    return "word"
             
 parsed_schema = parse_schema("../init.sql")
 with open("parsed_schema.json", "w") as f:
@@ -152,3 +180,4 @@ with open("parsed_schema.json", "w") as f:
 #print_generation_order_with_dependencies(parsed_schema)
 #dependency_graph = build_dependency_graph(parsed_schema)
 topological_sort(parsed_schema)
+print_generation_order_with_dependencies(parsed_schema)

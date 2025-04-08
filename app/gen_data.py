@@ -2,7 +2,7 @@ import json
 from faker import Faker
 import random
 
-fake = Faker('en_US')
+fake = Faker('pl_PL')
 
 class data_generator():
     def __init__(self, ROWS_PER_TABLE, data_configuration, schema):
@@ -29,6 +29,7 @@ class data_generator():
     
     def generate_fake_value(self, table_name, col, sql_type, data_configuration):
         table_config = data_configuration.get(table_name, {}).get("columns", {}).get(col)
+        print(type(table_config))
 
         if not table_config:
             return self.get_fallback_value(sql_type)
@@ -66,27 +67,30 @@ class data_generator():
         insert_statements = []
 
         for table_name, table_info in self.schema.items():
-            cols = [col["name"] for col in table_info["columns"] if col["type"] != "SERIAL"]
+            columns_dict = table_info.get("columns", {})
+
+            cols = [col_name for col_name, col_data in columns_dict.items() if col_data.get("type") != "SERIAL"]
             if not cols:
                 continue
 
             for _ in range(self.ROWS_PER_TABLE):
                 values = []
-                for col in table_info["columns"]:
-                    if col["type"] == "SERIAL":
-                        continue 
-                    val = self.generate_fake_value(table_name, col["name"], col["type"], self.data_configuration)
+                for col_name in cols:
+                    col_type = columns_dict[col_name].get("type")
+                    val = self.generate_fake_value(table_name, col_name, col_type, self.schema)
                     values.append(val)
-        
-                sql = f"INSERT INTO {table_name} ({', '.join(cols)}) VALUES ({', '.join(values)});"
+
+                col_names_str = ", ".join(cols)
+                values_str = ", ".join(values)
+                sql = f"INSERT INTO {table_name} ({col_names_str}) VALUES ({values_str});"
                 insert_statements.append(sql)
+
         return insert_statements
 
 
 dg = data_generator(10, "data_gen_config2.json", "parsed_schema.json")
 data = dg.generate_data()
 #data = dg.generate_insert_statements("data_gen_config2.json", "loactions", 10)
-print(data)
 with open("insert_data.sql", "w") as f:
     for s in data:
         f.write(f"{s}\n")
