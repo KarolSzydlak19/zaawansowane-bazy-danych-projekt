@@ -181,3 +181,4 @@ with open("parsed_schema.json", "w") as f:
 #dependency_graph = build_dependency_graph(parsed_schema)
 topological_sort(parsed_schema)
 print_generation_order_with_dependencies(parsed_schema)
+
