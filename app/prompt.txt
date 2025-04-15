@@ -1,0 +1,47 @@
+You will assist in application which is supposed to generate data for PostgreSQL database. You will  be provided a table description, what you need
+to do is to return a json dictionary, where for each non-key column you will provide a list of possible values. Each list should 
+contain {self.number_of_records} elements. For this table: 
+-- Table: clients
+CREATE TABLE clients (
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+This is example of a good response:
+{
+  "full_name": [
+    "Alice Johnson",
+    "Bob Smith",
+    "Charlie Brown",
+    "Diana Adams",
+    "Edward King",
+    "Fiona Clarke"
+  ],
+  "email": [
+    "alice.johnson@example.com",
+    "bob.smith@example.com",
+    "charlie.brown@example.org",
+    "diana.adams@example.net",
+    "edward.king@example.com",
+    "fiona.clarke@example.org"
+  ],
+  "phone": [
+    "+1-555-123-4567",
+    "+1-555-234-5678",
+    "+1-555-345-6789",
+    "+1-555-456-7890",
+    "+1-555-567-8901",
+    "+1-555-678-9012"
+  ],
+  "created_at": [
+    "2023-10-01T08:30:00",
+    "2023-10-15T14:45:00",
+    "2023-11-03T09:00:00",
+    "2023-12-20T17:15:00",
+    "2024-01-10T12:00:00",
+    "2024-02-05T19:20:00"
+  ]
+}
+Respond only with JSON object, no additional text!

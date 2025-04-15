@@ -1,6 +1,10 @@
 import json
 from faker import Faker
 import random
+from openai_client import oai_client
+import sqlparse
+import asyncio
+from sqlparse.tokens import Keyword
 
 fake = Faker('pl_PL')
 
@@ -10,6 +14,7 @@ class data_generator():
         self.data_configuration = self.get_gen_conf(data_configuration)
         self.schema = self.get_schema(schema)
         self.fake = fake
+        self.oai_client = oai_client(ROWS_PER_TABLE)
         
     def get_schema(self, filename):
         with open(filename, "r")as f:
@@ -86,12 +91,38 @@ class data_generator():
                 insert_statements.append(sql)
 
         return insert_statements
+    
+    def read_schema(self, filename):
+        with open(filename, "r") as file:
+            schema = file.read()
+        return schema
+
+    async def gen_oai(self):
+        init_schema = self.read_schema("../init.sql")
+        statements = sqlparse.split(init_schema)
+        for stmt in statements:
+            parsed = sqlparse.parse(stmt)[0]
+            if parsed.get_type() == 'CREATE':
+                tokens = [t for t in parsed.tokens if not t.is_whitespace]
+                for i, token in enumerate(tokens):
+                    if token.match(Keyword, 'TABLE'):
+                        table_name = tokens[i + 1].get_name()
+            response = await self.oai_client.generate_sample_data(stmt)
+            print(response)
+            response = json.loads(response)
+            columns = self.schema[table_name].get("columns", {})
+            for col_name, values in response.items():
+                if col_name in columns:
+                    columns[col_name]["values"] = values
+        with open("parsed_schema1.json", "w") as f:
+            json.dump(self.schema, f, indent=4)
 
 
 dg = data_generator(10, "data_gen_config2.json", "parsed_schema.json")
-data = dg.generate_data()
+asyncio.run(dg.gen_oai())
+#data = dg.generate_data()
 #data = dg.generate_insert_statements("data_gen_config2.json", "loactions", 10)
-with open("insert_data.sql", "w") as f:
-    for s in data:
-        f.write(f"{s}\n")
+#with open("insert_data.sql", "w") as f:
+#    for s in data:
+#        f.write(f"{s}\n")
 
