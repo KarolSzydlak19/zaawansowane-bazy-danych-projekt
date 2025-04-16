@@ -97,28 +97,38 @@ class data_generator():
             schema = file.read()
         return schema
 
-    async def gen_oai(self):
+    async def gen_oai(self, max_retries):
         init_schema = self.read_schema("../init.sql")
         statements = sqlparse.split(init_schema)
         for stmt in statements:
-            parsed = sqlparse.parse(stmt)[0]
-            if parsed.get_type() == 'CREATE':
-                tokens = [t for t in parsed.tokens if not t.is_whitespace]
-                for i, token in enumerate(tokens):
-                    if token.match(Keyword, 'TABLE'):
-                        table_name = tokens[i + 1].get_name()
-            response = await self.oai_client.generate_sample_data(stmt)
-            print(response)
-            response = json.loads(response)
-            columns = self.schema[table_name].get("columns", {})
-            for col_name, values in response.items():
-                if col_name in columns:
-                    columns[col_name]["values"] = values
+            retries = 0
+            #loop in case of a corrupt response
+            while retries < max_retries:
+                if retries >= max_retries:
+                    break
+
+                parsed = sqlparse.parse(stmt)[0]
+                if parsed.get_type() == 'CREATE':
+                    tokens = [t for t in parsed.tokens if not t.is_whitespace]
+                    for i, token in enumerate(tokens):
+                        if token.match(Keyword, 'TABLE'):
+                            table_name = tokens[i + 1].get_name()
+
+                try:
+                    response = await self.oai_client.generate_sample_data(stmt)
+                    response = json.loads(response)
+                    columns = self.schema[table_name].get("columns", {})
+                    for col_name, values in response.items():
+                        if col_name in columns:
+                            columns[col_name]["values"] = values
+                    break
+                except Exception as e:
+                    retries += 1
         with open("parsed_schema1.json", "w") as f:
             json.dump(self.schema, f, indent=4)
 
 
-dg = data_generator(10, "data_gen_config2.json", "parsed_schema.json")
+dg = data_generator(10, "data_gen_config.json", "parsed_schema.json")
 asyncio.run(dg.gen_oai())
 #data = dg.generate_data()
 #data = dg.generate_insert_statements("data_gen_config2.json", "loactions", 10)
