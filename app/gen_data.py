@@ -1,6 +1,8 @@
 import json
 from faker import Faker
 import random
+
+import app.sql_parser
 from openai_client import oai_client
 import sqlparse
 import asyncio
@@ -67,7 +69,7 @@ class data_generator():
             return f"'{fake.date_this_year()}'"
         else:
             return "NULL"
-    
+
     def generate_data(self):
         insert_statements = []
 
@@ -91,11 +93,39 @@ class data_generator():
                 insert_statements.append(sql)
 
         return insert_statements
-    
+
     def read_schema(self, filename):
         with open(filename, "r") as file:
             schema = file.read()
         return schema
+
+    def generate_insert_data(self, filename):
+        statements = []
+        for table_name, table_info in self.schema.items():
+            columns_dict = table_info.get("columns", {})
+
+            for _ in range(self.ROWS_PER_TABLE):
+                values = []
+                cols = [col_name for col_name, col_data in columns_dict.items() if "SERIAL" not in col_data.get("type")]
+                for col_name in cols:
+                    col_type = columns_dict[col_name].get("type")
+                    ref = app.sql_parser.extract_references(col_type)
+                    if ref is not None:
+                        #reference assumed to be singular foreign key, with no modification
+                        rand_ref = random.randint(0, self.ROWS_PER_TABLE)
+                        val = f"SELECT {ref[1]} FROM {ref[0]} WHERE {ref[1]}={rand_ref}"
+                    else:
+                        val_dict = self.schema[table_name].get("columns", {})[col_name]["values"]
+                        val = str(random.choice(val_dict))
+                    values.append(val)
+                col_names_str = ", ".join(cols)
+                values_str = ", ".join(values)
+                sql = f"INSERT INTO {table_name} ({col_names_str}) VALUES ({values_str});"
+                statements.append(sql)
+
+        with open(filename, "w") as f:
+            for s in statements:
+                f.write(f"{s}\n")
 
     async def gen_oai(self, max_retries):
         init_schema = self.read_schema("../init.sql")
@@ -128,11 +158,8 @@ class data_generator():
             json.dump(self.schema, f, indent=4)
 
 
-dg = data_generator(10, "data_gen_config.json", "parsed_schema.json")
-asyncio.run(dg.gen_oai())
+dg = data_generator(10, "data_gen_config.json", "example_ai_good.json")
+asyncio.run(dg.gen_oai(5))
 #data = dg.generate_data()
+dg.generate_insert_data("insert_data.sql")
 #data = dg.generate_insert_statements("data_gen_config2.json", "loactions", 10)
-#with open("insert_data.sql", "w") as f:
-#    for s in data:
-#        f.write(f"{s}\n")
-
