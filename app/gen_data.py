@@ -111,12 +111,14 @@ class data_generator():
                     col_type = columns_dict[col_name].get("type")
                     ref = app.sql_parser.extract_references(col_type)
                     if ref is not None:
-                        #reference assumed to be singular foreign key, with no modification
-                        rand_ref = random.randint(0, self.ROWS_PER_TABLE)
-                        val = f"SELECT {ref[1]} FROM {ref[0]} WHERE {ref[1]}={rand_ref}"
+                        # reference assumed to be singular foreign key, with no modification
+                        rand_ref = random.randint(1, self.ROWS_PER_TABLE)
+                        val = f"(SELECT {ref[1]} FROM {ref[0]} WHERE {ref[1]}={rand_ref})"
                     else:
                         val_dict = self.schema[table_name].get("columns", {})[col_name]["values"]
                         val = str(random.choice(val_dict))
+                        if any(ext in col_type for ext in ("VARCHAR", "TEXT", "DATE", "TIME")):
+                            val = "'" + val + "'"
                     values.append(val)
                 col_names_str = ", ".join(cols)
                 values_str = ", ".join(values)
@@ -158,7 +160,7 @@ class data_generator():
             json.dump(self.schema, f, indent=4)
 
 
-dg = data_generator(10, "data_gen_config.json", "example_ai_good.json")
+dg = data_generator(10, "data_gen_config.json", "parsed_schema.json")
 asyncio.run(dg.gen_oai(5))
 #data = dg.generate_data()
 dg.generate_insert_data("insert_data.sql")
