@@ -1,0 +1,292 @@
+{
+    "locations": {
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
+            },
+            "city": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": "city",
+                "values": "city"
+            },
+            "address": {
+                "type": "TEXT NOT NULL",
+                "provider": "address",
+                "values": "address"
+            }
+        }
+    },
+    "clients": {
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
+            },
+            "full_name": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": "name",
+                "values": "name"
+            },
+            "email": {
+                "type": "VARCHAR(100) UNIQUE NOT NULL",
+                "provider": "email",
+                "values": "email"
+            },
+            "phone": {
+                "type": "VARCHAR(20) ",
+                "provider": "phone_number",
+                "values": "phone_number"
+            },
+            "created_at": {
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+                "provider": "date_time",
+                "values": "date_time"
+            }
+        }
+    },
+    "bike_types": {
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
+            },
+            "name": {
+                "type": "VARCHAR(50) NOT NULL",
+                "provider": null,
+                "values": [
+                    "Mountain Bike",
+                    "Road Bike",
+                    "Hybrid Bike",
+                    "Electric Bike",
+                    "Folding Bike"
+                ]
+            }
+        }
+    },
+    "discounts": {
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
+            },
+            "name": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": null,
+                "values": [
+                    "Summer Sale",
+                    "Winter Discount",
+                    "Black Friday Deal",
+                    "New Year Promotion",
+                    "Holiday Special"
+                ]
+            },
+            "description": {
+                "type": "TEXT ",
+                "provider": null,
+                "values": [
+                    "Discount for summer season",
+                    "Winter season discount",
+                    "Black Friday special offer",
+                    "Promotion for New Year",
+                    "Holiday season discount"
+                ]
+            },
+            "percentage": {
+                "type": "NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100)",
+                "provider": "pyfloat(min_value=0, max_value=100)",
+                "values": "pyfloat(min_value=0, max_value=100)"
+            },
+            "valid_from": {
+                "type": "DATE ",
+                "provider": "date",
+                "values": "date"
+            },
+            "valid_to": {
+                "type": "DATE ",
+                "provider": "date",
+                "values": "date"
+            }
+        }
+    },
+    "bikes": {
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
+            },
+            "model": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": null,
+                "values": [
+                    "Model A",
+                    "Model B",
+                    "Model C",
+                    "Model D",
+                    "Model E"
+                ]
+            },
+            "type_id": {
+                "type": "INT REFERENCES bike_types(id)",
+                "provider": null,
+                "values": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                ]
+            },
+            "location_id": {
+                "type": "INT REFERENCES locations(id)",
+                "provider": null,
+                "values": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                ]
+            },
+            "status": {
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'available'",
+                "provider": null,
+                "values": [
+                    "available",
+                    "rented",
+                    "maintenance",
+                    "reserved",
+                    "sold"
+                ]
+            },
+            "daily_price": {
+                "type": "NUMERIC(10, 2) NOT NULL",
+                "provider": "pyfloat(min_value=0, max_value=1000)",
+                "values": "pyfloat(min_value=0, max_value=1000)"
+            }
+        }
+    },
+    "rentals": {
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
+            },
+            "client_id": {
+                "type": "INT REFERENCES clients(id)",
+                "provider": "pyint",
+                "values": "pyint"
+            },
+            "bike_id": {
+                "type": "INT REFERENCES bikes(id)",
+                "provider": "pyint",
+                "values": "pyint"
+            },
+            "rental_start": {
+                "type": "TIMESTAMP NOT NULL",
+                "provider": "date_time",
+                "values": "date_time"
+            },
+            "rental_end": {
+                "type": "TIMESTAMP ",
+                "provider": "date_time",
+                "values": "date_time"
+            },
+            "total_price": {
+                "type": "NUMERIC(10, 2)",
+                "provider": "pyfloat(min_value=0, max_value=10000)",
+                "values": "pyfloat(min_value=0, max_value=10000)"
+            },
+            "location_pickup_id": {
+                "type": "INT REFERENCES locations(id)",
+                "provider": "pyint",
+                "values": "pyint"
+            },
+            "location_dropoff_id": {
+                "type": "INT REFERENCES locations(id)",
+                "provider": "pyint",
+                "values": "pyint"
+            },
+            "discount_id": {
+                "type": "INT REFERENCES discounts(id)",
+                "provider": "pyint",
+                "values": "pyint"
+            },
+            "status": {
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'active'",
+                "provider": null,
+                "values": [
+                    "active",
+                    "completed",
+                    "cancelled"
+                ]
+            }
+        }
+    },
+    "maintenance_logs": {
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
+            },
+            "bike_id": {
+                "type": "INT REFERENCES bikes(id)",
+                "provider": "pyint",
+                "values": "pyint"
+            },
+            "description": {
+                "type": "TEXT NOT NULL",
+                "provider": "text",
+                "values": "text"
+            },
+            "maintenance_date": {
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+                "provider": "date_time",
+                "values": "date_time"
+            }
+        }
+    },
+    "bike_accessories": {
+        "columns": {
+            "id": {
+                "type": "SERIAL PRIMARY KEY",
+                "provider": "word"
+            },
+            "name": {
+                "type": "VARCHAR(100) NOT NULL",
+                "provider": null,
+                "values": [
+                    "Helmet",
+                    "Bike Pump",
+                    "LED Light",
+                    "Bike Lock",
+                    "Handlebar Grips"
+                ]
+            },
+            "daily_price": {
+                "type": "NUMERIC(10, 2)",
+                "provider": "pyfloat(min_value=0, max_value=500)",
+                "values": "pyfloat(min_value=0, max_value=500)"
+            }
+        }
+    },
+    "rental_accessories": {
+        "columns": {
+            "rental_id": {
+                "type": "INT REFERENCES rentals(id)",
+                "provider": "pyint",
+                "values": "pyint"
+            },
+            "accessory_id": {
+                "type": "INT REFERENCES bike_accessories(id)",
+                "provider": "pyint",
+                "values": "pyint"
+            },
+            "quantity": {
+                "type": "INT DEFAULT 1",
+                "provider": "pyint(min_value=1, max_value=10)",
+                "values": "pyint(min_value=1, max_value=10)"
+            }
+        }
+    }
+}

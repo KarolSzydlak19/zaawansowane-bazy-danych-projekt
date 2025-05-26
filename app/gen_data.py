@@ -2,26 +2,34 @@ import json
 from faker import Faker
 import random
 
-import app.sql_parser
+import sql_parser
 from openai_client import oai_client
 import sqlparse
 import asyncio
 from sqlparse.tokens import Keyword
+from sqlalchemy import create_engine, text
+
+# Replace with your actual credentials
+engine = create_engine("postgresql+psycopg2://postgres:password@localhost:5433/testdb")
 
 fake = Faker('pl_PL')
 
 class data_generator():
-    def __init__(self, ROWS_PER_TABLE, data_configuration, schema):
+    def __init__(self, ROWS_PER_TABLE, schema):
         self.ROWS_PER_TABLE = ROWS_PER_TABLE
-        self.data_configuration = self.get_gen_conf(data_configuration)
-        self.schema = self.get_schema(schema)
+        self.data_configuration = None
+        self.schema = None#self.get_schema(schema)
         self.fake = fake
         self.oai_client = oai_client(ROWS_PER_TABLE)
         
     def get_schema(self, filename):
         with open(filename, "r")as f:
             content = json.load(f)
-            return content
+            self.schema = content
+        
+    def save_schema(self, filename):
+        with open(filename, 'w') as file:
+            json.dump(self.schema, file, indent=4)
             
     def get_gen_conf(self, filename):
         with open(filename, "r") as f:
@@ -109,19 +117,50 @@ class data_generator():
                 cols = [col_name for col_name, col_data in columns_dict.items() if "SERIAL" not in col_data.get("type")]
                 for col_name in cols:
                     col_type = columns_dict[col_name].get("type")
-                    ref = app.sql_parser.extract_references(col_type)
+                    ref = sql_parser.extract_references(col_type)
                     if ref is not None:
                         #reference assumed to be singular foreign key, with no modification
                         rand_ref = random.randint(0, self.ROWS_PER_TABLE)
-                        val = f"SELECT {ref[1]} FROM {ref[0]} WHERE {ref[1]}={rand_ref}"
+                        val = f"(SELECT id FROM {ref[0]} ORDER BY RANDOM() LIMIT 1)"
                     else:
                         val_dict = self.schema[table_name].get("columns", {})[col_name]["values"]
-                        val = str(random.choice(val_dict))
+                        #print(val_dict)
+                        if isinstance(val_dict, list):
+                            raw_val = random.choice(val_dict)
+                        elif isinstance(val_dict, str):
+                            #raw_val = str(getattr(self.fake, val_dict)())
+                            parsed = parse_provider_string(val_dict)
+                            provider_name = parsed.pop("provider")
+                            provider_func = getattr(self.fake, provider_name)
+                            raw_val = str(provider_func(**parsed))
+
+                        #print(raw_val)
+                        if isinstance(raw_val, str):
+                            # Escape single quotes and wrap in single quotes
+                            escaped_val = raw_val.replace("'", "''")
+                            val = f"'{escaped_val}'"
+                        else:
+                            val = str(raw_val)
                     values.append(val)
                 col_names_str = ", ".join(cols)
                 values_str = ", ".join(values)
                 sql = f"INSERT INTO {table_name} ({col_names_str}) VALUES ({values_str});"
                 statements.append(sql)
+
+        with engine.connect() as connection:
+            trans = connection.begin()
+            count = -1
+            try:
+                for stmt in statements:
+                    count += 1
+                    connection.execute(text(stmt))
+                    if(count == 9):
+                        trans.commit()
+                        trans = connection.begin()
+                        count = -1
+            except Exception as e:
+                #trans.rollback()
+                print("Error:", e)
 
         with open(filename, "w") as f:
             for s in statements:
@@ -146,20 +185,65 @@ class data_generator():
 
                 try:
                     response = await self.oai_client.generate_sample_data(stmt)
+                    #response = self.oai_client.local_model_call(stmt)
+                    print(response)
                     response = json.loads(response)
+                    print(response)
                     columns = self.schema[table_name].get("columns", {})
                     for col_name, values in response.items():
                         if col_name in columns:
-                            columns[col_name]["values"] = values
+                            if isinstance(values, list):
+                                columns[col_name]["values"] = values
+                                columns[col_name]["provider"] = None
+                            elif isinstance(values, str):
+                                columns[col_name]["provider"] = values
+                                columns[col_name]["values"] = values
                     break
                 except Exception as e:
+                    print(e)
                     retries += 1
         with open("parsed_schema1.json", "w") as f:
             json.dump(self.schema, f, indent=4)
 
+import ast
 
-dg = data_generator(10, "data_gen_config.json", "example_ai_good.json")
-asyncio.run(dg.gen_oai(5))
+def parse_provider_string(s: str) -> dict:
+    s = s.strip()
+
+    if "(" not in s:
+        return {"provider": s}
+
+    if not s.endswith(")"):
+        raise ValueError("Invalid provider string format")
+
+    func_name, args_str = s.split("(", 1)
+    args_str = args_str.rstrip(")")
+
+    args_dict = {}
+    if args_str.strip():
+        call_node = ast.parse(f"{func_name}({args_str})", mode="eval").body
+
+        if not isinstance(call_node, ast.Call):
+            raise ValueError("Parsed expression is not a function call")
+
+        for kw in call_node.keywords:
+            key = kw.arg
+            value = ast.literal_eval(kw.value)
+            args_dict[key] = value
+
+    args_dict["provider"] = func_name.strip()
+    return args_dict
+
+
+
+
+#dg = data_generator(1000, "data_gen_config.json", "parsed_schema1.json")
+# asyncio.run(dg.gen_oai(5))
 #data = dg.generate_data()
-dg.generate_insert_data("insert_data.sql")
+#asyncio.run(dg.gen_oai(5))
+#dg.save_schema("data_source.json")
+#dg.generate_insert_data("insert_data.sql")
 #data = dg.generate_insert_statements("data_gen_config2.json", "loactions", 10)
+
+#dg.get_schema("data_source.json")
+#dg.generate_insert_data("insert_data.sql")
