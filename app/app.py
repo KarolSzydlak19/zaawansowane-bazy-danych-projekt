@@ -15,7 +15,7 @@ def spinner_task(stop_event):
         sys.stdout.write(f"\r{spinner[idx % len(spinner)]} Generating... ")
         sys.stdout.flush()
         idx += 1
-        time.sleep(0.1)
+        time.sleep(0.2)
 
 
 def main():

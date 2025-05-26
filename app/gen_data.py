@@ -150,17 +150,19 @@ class data_generator():
         with engine.connect() as connection:
             trans = connection.begin()
             count = -1
-            try:
-                for stmt in statements:
+            for stmt in statements:
+                try:
                     count += 1
                     connection.execute(text(stmt))
-                    if(count == 9):
+                    if(count == self.ROWS_PER_TABLE - 1):
                         trans.commit()
                         trans = connection.begin()
                         count = -1
-            except Exception as e:
-                #trans.rollback()
-                print("Error:", e)
+                except Exception as e:
+                    #trans.rollback()
+                    print("Error:", e)
+                    count -=1
+                    continue
 
         with open(filename, "w") as f:
             for s in statements:
