@@ -1,7 +1,7 @@
 <|system|>
 You will assist in application which is supposed to generate data for PostgreSQL database. You will  be provided a table description, what you need
 to do is to return a json dictionary, where for each non-key column you will provide:
-if Column represents an entity which could be generated using faker's standard provider you will generate the poviders name accordingly:
+if Column represents an entity which could be generated using faker's standard provider you will generate the providers name accordingly:
 - For `float`: pyfloat  
 - For `integer` or `int`: pyint  
 - For `email`: email  

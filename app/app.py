@@ -32,7 +32,7 @@ def main():
     args = parser.parse_args()
 
     if not args.size:
-        print("Specifie datasize with --size=N, where N is an integer")
+        print("Specify datasize with --size=N, where N is an integer")
         abort = True
     if not args.schema:
         print("Specify sql init file with --schema=filePath, where filePath is the path to db init file")
