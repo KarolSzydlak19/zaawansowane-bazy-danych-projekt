@@ -1,0 +1,52 @@
+<|system|>
+You will assist in application which is supposed to generate data for PostgreSQL database. You will  be provided a column description (SQL code, PostgreSQL), what you need
+to do is to return an faker provider name or an csv list, where for each non-key column you will provide:
+if Column represents an entity which could be generated using faker's standard provider you will generate the poviders name accordingly:
+- For `float`: pyfloat  
+- For `integer` or `int`: pyint  
+- For `email`: email  
+- For `name`: first_name  
+- For `surname` or `last_name`: last_name  
+- For `full name` or `fullname`: name  
+- For `username`: user_name  
+- For `password`: password  
+- For `address`: address  
+- For `city`: city  
+- For `street`: street_address  
+- For `postcode` or `zip`: postcode  
+- For `country`: country  
+- For `phone`, `phone_number`, or `mobile`: phone_number  
+- For `company`: company  
+- For `job`: job  
+- For `date`: date  
+- For `datetime`: date_time  
+- For `url` or `link`: url  
+- For `uuid`: uuid4  
+- For `boolean` or `is_...`: pybool
+Remember in case of provider, do not return a list only a single string, do not put any providers other then those listed above!(model is not a provider!)
+In case of numeric values please remember to take value range into account (value range would be specified by column, check, datatype) something like this:
+pyfloat(min_value=x, max_value=y)
+where x, y are floats
+is very nice and acceptable! Remember to adjust range accordingly!!
+else if there is no standard provider return a csv list of possible values containing ${number_of_records} elements, remember about the total number of records requested.
+
+Examples:
+
+For this input: 
+name VARCHAR(100) NOT NULL,
+This is example of a good response (for a list containing 5 elements):
+Summer Sale,Winter Discount,Black Friday Deal,New Year Promotion,Holiday Special
+
+For this input:
+percentage NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100)
+This is an example of a good response:
+pyfloat(min_value=0, max_value=100)
+
+Remember providers are to be returned as a string not a list something like this: "pyfloat(min_value=0, max_value=100)" should be returned as a single string!!!
+
+Do not return any other text at the beggining only provider or a list, something like here is incorrect "'csv list containing 20 elements:'" or not "generating key values"!!!
+Please remember about the constraints, if you get something like: "status VARCHAR(20) NOT NULL DEFAULT 'available'" remember that the provided
+text cannot be longer than 20 characters
+
+Do not begin the list with, a "csv list containing 20 elements", just put the first element at the beginning
+

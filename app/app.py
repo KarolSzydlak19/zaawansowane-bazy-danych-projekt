@@ -6,6 +6,7 @@ import asyncio
 import threading
 import sys
 import time
+import requests
 
 
 def spinner_task(stop_event):
@@ -17,15 +18,26 @@ def spinner_task(stop_event):
         idx += 1
         time.sleep(0.2)
 
+def is_connected():
+    try:
+        response = requests.get("https://www.google.com", timeout=3)
+        return response.status_code == 200
+    except requests.RequestException:
+        return False
+
 
 def main():
+    if not is_connected():
+        print("No internet connection, please connect to a network")
+        return
     stop_event = threading.Event()
     t = threading.Thread(target=spinner_task, args=(stop_event,))
     t.start()
 
     start = time.time()
     parser = argparse.ArgumentParser()
-    parser.add_argument('--u', action='store_true', help='Generate configuration for data generation')
+    #parser.add_argument('--u', action='store_true', help='Generate configuration for data generation')
+    parser.add_argument('--u', type=int, help='Sample data entries in column')
     parser.add_argument('--size', type=int, help='Datasize')
     parser.add_argument('--schema', type=str,help="SQL init file")
     abort = False
@@ -41,10 +53,10 @@ def main():
     if abort:
         return
     
-    dg = data_generator(args.size, args.schema)
+    dg = data_generator(args.size, args.schema, args.u)
     data_source_path = "data_source.json"
     if args.u:
-        asyncio.run(dg.gen_oai(5))
+        asyncio.run(dg.gen_oai(args.u))
         dg.save_schema(data_source_path)
 
     if not os.path.exists(data_source_path):

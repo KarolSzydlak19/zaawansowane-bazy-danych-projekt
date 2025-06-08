@@ -56,6 +56,19 @@ def extract_columns(token_list):
                     }
     return columns
 
+def extract_column_names(token_list):
+    columns = []
+    for token in token_list:
+        if isinstance(token, Parenthesis):
+            inside = token.value[1:-1]
+            lines = split_line(inside) 
+            for line in lines:
+                parts = line.split()
+                if len(parts) >= 2 and not parts[0].upper() in ('PRIMARY', 'FOREIGN', 'CONSTRAINT'):
+                    columns.append(line)
+                    
+    return columns
+
 def parse_schema(filename):
     schema = read_schema(filename)
     statements = sqlparse.split(schema)

@@ -28,7 +28,8 @@ In case of numeric values please remember to take value range into account (valu
 pyfloat(min_value=x, max_value=y)
 where x, y are floats
 is very nice and acceptable! Remember to adjust range accordingly!!
-else if there is no standard provider return list of possible values contain {self.number_of_records} elements. For this table: 
+else if there is no standard provider return list of possible values containing ${number_of_records} elements if such number makes sense.
+ For this table: 
 -- Table: discounts
 CREATE TABLE discounts (
     id SERIAL PRIMARY KEY,
@@ -38,7 +39,7 @@ CREATE TABLE discounts (
     valid_from DATE,
     valid_to DATE
 );
-This is example of a good response (for 5 elements):
+This is example of a good response (for a list containing 5 elements):
 {
   "name": ["Summer Sale", "Winter Discount", "Black Friday Deal", "New Year Promotion", "Holiday Special"],
   "description": ["Discount for summer season", "Winter season discount", "Black Friday special offer", "Promotion for New Year", "Holiday season discount"],
@@ -47,4 +48,3 @@ This is example of a good response (for 5 elements):
   "valid_to": "date"
 }
 Respond only with JSON object, no additional text!
-<|user|>

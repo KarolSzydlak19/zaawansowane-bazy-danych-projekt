@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
+from string import Template
 
 #model_id = "HuggingFaceH4/zephyr-7b-beta"
 
@@ -11,15 +11,17 @@ import torch
 
 load_dotenv()
 
-def read_txt(filepath):
-    with open(filepath, "r") as f:
-        return f.read()
 
 class oai_client():
     def __init__(self, number_of_records):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.number_of_records = number_of_records
-        self.system_prompt = read_txt("prompt.txt")
+        self.system_prompt = self.read_txt("prompt1.txt")
+    
+    def read_txt(self, filepath):
+        with open(filepath, "r") as f:
+            template =  Template(f.read())
+        return template.substitute(number_of_records = self.number_of_records)
             
     async def generate_sample_data(self, user_prompt: str):
         try:
