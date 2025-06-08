@@ -2,17 +2,17 @@
     "locations": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the location",
                 "provider": null
             },
             "city": {
-                "type": "VARCHAR(100) NOT NULL",
+                "type": "VARCHAR(100) NOT NULL, -- Name of the city where the location is",
                 "provider": "city",
                 "values": null
             },
             "address": {
-                "type": "TEXT NOT NULL",
-                "provider": "address",
+                "type": "TEXT NOT NULL -- Specific street address of the location",
+                "provider": "street_address",
                 "values": null
             }
         }
@@ -20,26 +20,26 @@
     "clients": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the client",
                 "provider": null
             },
             "full_name": {
-                "type": "VARCHAR(100) NOT NULL",
+                "type": "VARCHAR(100) NOT NULL, -- Full name of the client",
                 "provider": "name",
                 "values": null
             },
             "email": {
-                "type": "VARCHAR(100) UNIQUE NOT NULL",
+                "type": "VARCHAR(100) UNIQUE NOT NULL, -- Email address of the client",
                 "provider": "email",
                 "values": null
             },
             "phone": {
-                "type": "VARCHAR(20) ",
+                "type": "VARCHAR(20), -- Phone number of the client",
                 "provider": "phone_number",
                 "values": null
             },
             "created_at": {
-                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of when the client was registered",
                 "provider": "date_time",
                 "values": null
             }
@@ -48,11 +48,11 @@
     "bike_types": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the bike type",
                 "provider": null
             },
             "name": {
-                "type": "VARCHAR(50) NOT NULL",
+                "type": "VARCHAR(50) NOT NULL -- Name of the bike type (e.g., mountain, road, electric)",
                 "provider": "first_name",
                 "values": null
             }
@@ -61,52 +61,76 @@
     "discounts": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the discount",
                 "provider": null
             },
             "name": {
-                "type": "VARCHAR(100) NOT NULL",
-                "provider": "first_name",
-                "values": null
-            },
-            "description": {
-                "type": "TEXT ",
+                "type": "VARCHAR(100) NOT NULL, -- Name of the discount (e.g., \"Summer Promo\")",
                 "provider": null,
                 "values": [
-                    "csv list containing 20 elements: Sample text1",
-                    "Sample text2",
-                    "Sample text3",
-                    "Sample text4",
-                    "Sample text5",
-                    "Sample text6",
-                    "Sample text7",
-                    "Sample text8",
-                    "Sample text9",
-                    "Sample text10",
-                    "Sample text11",
-                    "Sample text12",
-                    "Sample text13",
-                    "Sample text14",
-                    "Sample text15",
-                    "Sample text16",
-                    "Sample text17",
-                    "Sample text18",
-                    "Sample text19",
-                    "Sample text20"
+                    "Summer Promo",
+                    "Winter Deal",
+                    "Black Friday Sale",
+                    "Holiday Discount",
+                    "New Year Offer",
+                    "Spring Savings",
+                    "Autumn Promotion",
+                    "Exclusive Deal",
+                    "Mega Sale",
+                    "Clearance",
+                    "Limited Offer",
+                    "Special Offer",
+                    "Flash Sale",
+                    "Big Discount",
+                    "Weekend Deal",
+                    "Member Discount",
+                    "Early Bird Offer",
+                    "Last Minute Deal",
+                    "Special Reduction",
+                    "Seasonal Sale",
+                    "Daily Deal",
+                    "Holiday Special",
+                    "Super Savings",
+                    "VIP Discount",
+                    "Best Price",
+                    "Early Access",
+                    "Limited Time Offer",
+                    "Exclusive Savings",
+                    "Members Only",
+                    "Fast Deal",
+                    "Special Event",
+                    "Hot Offer",
+                    "Reward Bonus",
+                    "Cashback Deal",
+                    "Price Drop",
+                    "Deal of the Day",
+                    "New Arrival Promotion",
+                    "Early Bird Discount",
+                    "Seasonal Offer",
+                    "Special Sale",
+                    "Limited Discount",
+                    "Top Deal",
+                    "Clearance Sale",
+                    "Special Price"
                 ]
             },
+            "description": {
+                "type": "TEXT, -- Detailed description of the discount",
+                "provider": "paragraph",
+                "values": null
+            },
             "percentage": {
-                "type": "NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100)",
+                "type": "NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100), -- Discount percentage (0\u00e2\u20ac\u201c100%)",
                 "provider": "pyfloat(min_value=0,  max_value=100)",
                 "values": null
             },
             "valid_from": {
-                "type": "DATE ",
+                "type": "DATE, -- Start date when the discount is valid",
                 "provider": "date",
                 "values": null
             },
             "valid_to": {
-                "type": "DATE ",
+                "type": "DATE -- End date when the discount expires",
                 "provider": "date",
                 "values": null
             }
@@ -115,72 +139,72 @@
     "bikes": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the bike",
                 "provider": null
             },
             "model": {
-                "type": "VARCHAR(100) NOT NULL",
+                "type": "VARCHAR(100) NOT NULL, -- Model name of the bike",
                 "provider": null,
                 "values": [
-                    "csv list containing 20 elements: Sedan",
-                    "Coupe",
-                    "Convertible",
-                    "Minivan",
-                    "SUV",
-                    "Wagon",
-                    "Pickup Truck",
-                    "Hatchback",
-                    "Sports Car",
-                    "Crossover",
-                    "Electric",
-                    "Hybrid",
-                    "Diesel",
-                    "Gasoline",
-                    "Luxury",
-                    "Compact",
-                    "Familiy",
-                    "Off-road",
-                    "Classic",
-                    "Convertible"
+                    "model",
+                    "model_name",
+                    "model_type",
+                    "model_code",
+                    "model_variant",
+                    "model_number",
+                    "model_id",
+                    "model_label",
+                    "model classification",
+                    "model designation",
+                    "model design"
                 ]
             },
             "type_id": {
-                "type": "INT REFERENCES bike_types(id)",
+                "type": "INT REFERENCES bike_types(id), -- Foreign key referencing the bike type",
                 "provider": null
             },
             "location_id": {
-                "type": "INT REFERENCES locations(id)",
+                "type": "INT REFERENCES locations(id), -- Foreign key indicating the current location of the bike",
                 "provider": null
             },
             "status": {
-                "type": "VARCHAR(20) NOT NULL DEFAULT 'available'",
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'available', -- Status of the bike (e.g., available, rented, maintenance)",
                 "provider": null,
                 "values": [
-                    "csv list containing 20 elements: available",
-                    "unavailable",
-                    "pending",
-                    "completed",
-                    "failed",
-                    "processing",
-                    "shipped",
-                    "cancelled",
-                    "refunded",
-                    "returned",
-                    "in transit",
-                    "not started",
-                    " in progress",
-                    " on hold",
+                    "available",
+                    " rented",
+                    " maintenance",
+                    " unavailable",
+                    " reserved",
+                    " in_service",
+                    " out_of_order",
+                    " pending",
+                    " sold",
+                    " returned",
+                    " on_hold",
+                    " cleaning",
+                    " inspection",
+                    " repaired",
+                    " lost",
+                    " damaged",
+                    " stolen",
+                    " refurbished",
+                    " withdrawn",
                     " scheduled",
-                    " canceled",
-                    " delayed",
-                    " confirmed",
-                    " cancelled by user",
-                    " awaiting approval"
+                    " active",
+                    " inactive",
+                    " in_use",
+                    " reserved_for_use",
+                    " offsite",
+                    " on_site",
+                    " under_review",
+                    " pending_repair",
+                    " ready"
                 ]
             },
             "daily_price": {
-                "type": "NUMERIC(10, 2) NOT NULL",
-                "provider": "pyfloat(min_value=0,  max_value=99999999.99)",
+                "type": "NUMERIC(10, 2) NOT NULL -- Rental price per day for the bike",
+                "provider": "pyfloat(min_value=0,  max_value=9999999.99)",
                 "values": null
             }
         }
@@ -188,68 +212,68 @@
     "rentals": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the rental transaction",
                 "provider": null
             },
             "client_id": {
-                "type": "INT REFERENCES clients(id)",
+                "type": "INT REFERENCES clients(id), -- Foreign key referencing the renting client",
                 "provider": null
             },
             "bike_id": {
-                "type": "INT REFERENCES bikes(id)",
+                "type": "INT REFERENCES bikes(id), -- Foreign key referencing the rented bike",
                 "provider": null
             },
             "rental_start": {
-                "type": "TIMESTAMP NOT NULL",
+                "type": "TIMESTAMP NOT NULL, -- Timestamp when the rental started",
                 "provider": "date_time",
                 "values": null
             },
             "rental_end": {
-                "type": "TIMESTAMP ",
+                "type": "TIMESTAMP, -- Timestamp when the rental ended (nullable for ongoing rentals)",
                 "provider": "date_time",
                 "values": null
             },
             "total_price": {
-                "type": "NUMERIC(10, 2)",
-                "provider": "pyfloat(min_value=0,  max_value=99999999.99)",
+                "type": "NUMERIC(10, 2), -- Total price charged for the rental",
+                "provider": "pyfloat(min_value=0,  max_value=9999999.99)",
                 "values": null
             },
             "location_pickup_id": {
-                "type": "INT REFERENCES locations(id)",
+                "type": "INT REFERENCES locations(id), -- Foreign key indicating the pickup location",
                 "provider": null
             },
             "location_dropoff_id": {
-                "type": "INT REFERENCES locations(id)",
+                "type": "INT REFERENCES locations(id), -- Foreign key indicating the drop-off location",
                 "provider": null
             },
             "discount_id": {
-                "type": "INT REFERENCES discounts(id)",
+                "type": "INT REFERENCES discounts(id), -- Foreign key referencing any applied discount",
                 "provider": null
             },
             "status": {
-                "type": "VARCHAR(20) NOT NULL DEFAULT 'active'",
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'active' -- Status of the rental (e.g., active, completed, cancelled)",
                 "provider": null,
                 "values": [
                     "active",
-                    " \"inactive\"",
-                    " \"pending\"",
-                    " \"completed\"",
-                    " \"failed\"",
-                    " \"cancelled\"",
-                    " \"shipped\"",
-                    " \"delivered\"",
-                    " \"processing\"",
-                    " \"review\"",
-                    " \"refunded\"",
-                    " \"on hold\"",
-                    " \"draft\"",
-                    " \"archived\"",
-                    " \"failed payment\"",
-                    " \"verified\"",
-                    " \"unverified\"",
-                    " \"scheduled\"",
-                    " \"rescheduled\"",
-                    " \"cancel request\""
+                    "completed",
+                    "cancelled",
+                    "pending",
+                    "failed",
+                    "refunded",
+                    "processing",
+                    "shipped",
+                    "delivered",
+                    "returned",
+                    "cancelled_by_user",
+                    "expired",
+                    "approved",
+                    "rejected",
+                    "pending_payment",
+                    "confirmed",
+                    "disputed",
+                    "completed_with_issues",
+                    "scheduled",
+                    "parked"
                 ]
             }
         }
@@ -257,41 +281,66 @@
     "maintenance_logs": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the maintenance log entry",
                 "provider": null
             },
             "bike_id": {
-                "type": "INT REFERENCES bikes(id)",
+                "type": "INT REFERENCES bikes(id), -- Foreign key referencing the bike that was serviced",
                 "provider": null
             },
             "description": {
-                "type": "TEXT NOT NULL",
+                "type": "TEXT NOT NULL, -- Description of the maintenance work performed",
                 "provider": null,
                 "values": [
-                    "csv list containing 20 elements: Value1",
-                    "Value2",
-                    "Value3",
-                    "Value4",
-                    "Value5",
-                    "Value6",
-                    "Value7",
-                    "Value8",
-                    "Value9",
-                    "Value10",
-                    "Value11",
-                    "Value12",
-                    "Value13",
-                    "Value14",
-                    "Value15",
-                    "Value16",
-                    "Value17",
-                    "Value18",
-                    "Value19",
-                    "Value20"
+                    "csv list containing 50 elements: Repair",
+                    "Replacement",
+                    "Inspection",
+                    "Testing",
+                    "Calibration",
+                    "Cleaning",
+                    "Adjustment",
+                    "Upgrade",
+                    "Modification",
+                    "Installation",
+                    "Removal",
+                    "Rejection",
+                    "Verification",
+                    "Documentation",
+                    "Analysis",
+                    "Calibration",
+                    "Calibration",
+                    "Repair",
+                    "Replacement",
+                    "Testing",
+                    "Inspection",
+                    "Upgrade",
+                    "Adjustment",
+                    "Cleaning",
+                    "Modification",
+                    "Installation",
+                    "Removal",
+                    "Verification",
+                    "Documentation",
+                    "Repair",
+                    "Calibration",
+                    "Testing",
+                    "Adjustment",
+                    "Cleaning",
+                    "Upgrade",
+                    "Modification",
+                    "Installation",
+                    "Removal",
+                    "Verification",
+                    "Repair",
+                    "Replacement",
+                    "Inspection",
+                    "Testing",
+                    "Calibration",
+                    "Documentation"
                 ]
             },
             "maintenance_date": {
-                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp when maintenance was performed",
                 "provider": "date_time",
                 "values": null
             }
@@ -300,17 +349,17 @@
     "bike_accessories": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the accessory",
                 "provider": null
             },
             "name": {
-                "type": "VARCHAR(100) NOT NULL",
+                "type": "VARCHAR(100) NOT NULL, -- Name of the accessory (e.g., helmet, child seat)",
                 "provider": "first_name",
                 "values": null
             },
             "daily_price": {
-                "type": "NUMERIC(10, 2)",
-                "provider": "pyfloat(min_value=0,  max_value=99999999.99)",
+                "type": "NUMERIC(10, 2) -- Rental price per day for the accessory",
+                "provider": "pyfloat(min_value=0,  max_value=9999999.99)",
                 "values": null
             }
         }
@@ -318,16 +367,16 @@
     "rental_accessories": {
         "columns": {
             "rental_id": {
-                "type": "INT REFERENCES rentals(id)",
+                "type": "INT REFERENCES rentals(id), -- Foreign key referencing the rental transaction",
                 "provider": null
             },
             "accessory_id": {
-                "type": "INT REFERENCES bike_accessories(id)",
+                "type": "INT REFERENCES bike_accessories(id), -- Foreign key referencing the accessory",
                 "provider": null
             },
             "quantity": {
-                "type": "INT DEFAULT 1",
-                "provider": "pyint(min_value=1,  max_value=2147483647)",
+                "type": "INT DEFAULT 1, -- Number of units of this accessory rented",
+                "provider": "pyint(min_value=1)",
                 "values": null
             }
         }

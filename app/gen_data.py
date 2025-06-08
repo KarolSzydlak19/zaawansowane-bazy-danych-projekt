@@ -13,7 +13,6 @@ import csv
 from io import StringIO
 from sqlalchemy import text
 
-# Replace with your actual credentials
 engine = create_engine("postgresql+psycopg2://postgres:password@localhost:5433/testdb")
 
 fake = Faker('pl_PL')
@@ -45,42 +44,6 @@ class data_generator():
         [entry["name"] for entry in data_list]
         )
         return random_name
-    
-    # def generate_fake_value(self, table_name, col, sql_type, data_configuration):
-    #     table_config = data_configuration.get(table_name, {}).get("columns", {}).get(col)
-    #     print(type(table_config))
-
-    #     if not table_config:
-    #         return self.get_fallback_value(sql_type)
-
-    #     if "values" in table_config:
-    #         return self.get_conf_value(table_config["values"])
-
-    #     elif "provider" in table_config:
-    #         provider = table_config["provider"]
-            
-    #         if hasattr(self.fake, provider):
-    #             return str(getattr(self.fake, provider)())
-    #         else:
-    #             raise ValueError(f"No such provider: {provider}")
-
-    #     return self.get_fallback_value(sql_type)
-    
-    # def get_fallback_value(self, sql_type):                    
-    #     if "VARCHAR" in sql_type or "TEXT" in sql_type:
-    #         return "'{}'".format(fake.text(max_nb_chars=50).replace("'", "''"))
-    #     elif "EMAIL" in sql_type:
-    #         return f"'{fake.email()}'"
-    #     elif "INT" in sql_type or "SERIAL" in sql_type:
-    #         return str(random.randint(1, 100))
-    #     elif "NUMERIC" in sql_type or "DECIMAL" in sql_type:
-    #         return str(round(random.uniform(10, 100), 2))
-    #     elif "TIMESTAMP" in sql_type:
-    #         return f"'{fake.date_time_this_year().isoformat(sep=' ')}'"
-    #     elif "DATE" in sql_type:
-    #         return f"'{fake.date_this_year()}'"
-    #     else:
-    #         return "NULL"
 
     def generate_data(self):
         insert_statements = []
@@ -151,25 +114,22 @@ class data_generator():
                 sql = f"INSERT INTO {table_name} ({col_names_str}) VALUES ({values_str});"
                 statements.append(sql)
 
+        BATCH_SIZE = self.ROWS_PER_TABLE
         with engine.connect() as connection:
             trans = connection.begin()
-            count = -1
-            for stmt in statements:
+            for i, stmt in enumerate(statements):
                 try:
-                    count += 1
-                    #trans = connection.begin()
                     connection.execute(text(stmt))
-                    #trans.commit()
-                    if(count == self.ROWS_PER_TABLE - 1):
+                    if (i + 1) % BATCH_SIZE == 0:
                         trans.commit()
                         trans = connection.begin()
-                        count = -1
                 except Exception as e:
-                    #trans.rollback()
                     print("Error:", e)
-                    count -=1
-                    continue
-
+                    print("Query:", stmt)
+                    trans.rollback()
+                    trans = connection.begin()
+            if trans.is_active:
+                trans.commit()
         with open(filename, "w") as f:
             for s in statements:
                 f.write(f"{s}\n")
@@ -191,9 +151,6 @@ class data_generator():
                         if token.match(Keyword, 'TABLE'):
                             table_name = tokens[i + 1].get_name()
 
-                #table_name_match = re.search(r'CREATE TABLE\s+(\w+)', stmt, re.IGNORECASE)
-                #table_name = table_name_match.group(1) if table_name_match else None
-
                 parsed = sqlparse.parse(stmt)[0]
                 token_list = list(parsed.tokens)
                 columns = sql_parser.extract_column_names(token_list)
@@ -205,11 +162,10 @@ class data_generator():
                             jcolumns[col_name]["provider"] = None
                             continue
                         response = await self.oai_client.generate_sample_data(col)
-                        #response = json.loads(response)
                         csv_file = StringIO(response)
                         reader = csv.reader(csv_file)
                         rows = list(reader)
-                        if len(rows) == 1 and len(rows[0]) == 1:
+                        if len(rows) == 1 and len(rows[0]) == 1 and "," not in rows[0][0]:
                             # pojedyncza wartość = provider
                             value = rows[0][0]
                             jcolumns[col_name]["provider"] = value
@@ -224,20 +180,6 @@ class data_generator():
                             jcolumns[col_name]["provider"] = None
                             jcolumns[col_name]["values"] = rows[0]
                         retries = max_retries
-                    # response = await self.oai_client.generate_sample_data(stmt)
-                    # #response = json.loads(response)
-                    # csv_file = StringIO(response)
-                    # reader = csv.reader(csv_file)
-                    # for row in re
-                    # columns = self.schema[table_name].get("columns", {})
-                    # for col_name, values in response.items():
-                    #     if col_name in columns:
-                    #         if isinstance(values, list):
-                    #             columns[col_name]["values"] = values
-                    #             columns[col_name]["provider"] = None
-                    #         elif isinstance(values, str):
-                    #             columns[col_name]["provider"] = values
-                    #             columns[col_name]["values"] = values
                 except Exception as e:
                     print(f"Error calling OpenAI: {e}")
                     retries += 1
@@ -272,17 +214,3 @@ def parse_provider_string(s: str) -> dict:
 
     args_dict["provider"] = func_name.strip()
     return args_dict
-
-
-
-
-#dg = data_generator(1000, "data_gen_config.json", "parsed_schema1.json")
-# asyncio.run(dg.gen_oai(5))
-#data = dg.generate_data()
-#asyncio.run(dg.gen_oai(5))
-#dg.save_schema("data_source.json")
-#dg.generate_insert_data("insert_data.sql")
-#data = dg.generate_insert_statements("data_gen_config2.json", "loactions", 10)
-
-#dg.get_schema("data_source.json")
-#dg.generate_insert_data("insert_data.sql")

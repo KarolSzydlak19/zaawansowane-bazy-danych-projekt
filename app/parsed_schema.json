@@ -2,15 +2,15 @@
     "locations": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the location",
                 "provider": "word"
             },
             "city": {
-                "type": "VARCHAR(100) NOT NULL",
+                "type": "VARCHAR(100) NOT NULL, -- Name of the city where the location is",
                 "provider": "city"
             },
             "address": {
-                "type": "TEXT NOT NULL",
+                "type": "TEXT NOT NULL -- Specific street address of the location",
                 "provider": "street_address"
             }
         }
@@ -18,23 +18,23 @@
     "clients": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the client",
                 "provider": "word"
             },
             "full_name": {
-                "type": "VARCHAR(100) NOT NULL",
+                "type": "VARCHAR(100) NOT NULL, -- Full name of the client",
                 "provider": "name"
             },
             "email": {
-                "type": "VARCHAR(100) UNIQUE NOT NULL",
+                "type": "VARCHAR(100) UNIQUE NOT NULL, -- Email address of the client",
                 "provider": "email"
             },
             "phone": {
-                "type": "VARCHAR(20) ",
+                "type": "VARCHAR(20), -- Phone number of the client",
                 "provider": "phone_number"
             },
             "created_at": {
-                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of when the client was registered",
                 "provider": "date_time_this_year"
             }
         }
@@ -42,11 +42,11 @@
     "bike_types": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the bike type",
                 "provider": "word"
             },
             "name": {
-                "type": "VARCHAR(50) NOT NULL",
+                "type": "VARCHAR(50) NOT NULL -- Name of the bike type (e.g., mountain, road, electric)",
                 "provider": "word"
             }
         }
@@ -54,27 +54,27 @@
     "discounts": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the discount",
                 "provider": "word"
             },
             "name": {
-                "type": "VARCHAR(100) NOT NULL",
+                "type": "VARCHAR(100) NOT NULL, -- Name of the discount (e.g., \"Summer Promo\")",
                 "provider": "word"
             },
             "description": {
-                "type": "TEXT ",
+                "type": "TEXT, -- Detailed description of the discount",
                 "provider": "word"
             },
             "percentage": {
-                "type": "NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100)",
+                "type": "NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100), -- Discount percentage (0\u00e2\u20ac\u201c100%)",
                 "provider": "word"
             },
             "valid_from": {
-                "type": "DATE ",
+                "type": "DATE, -- Start date when the discount is valid",
                 "provider": "word"
             },
             "valid_to": {
-                "type": "DATE ",
+                "type": "DATE -- End date when the discount expires",
                 "provider": "word"
             }
         }
@@ -82,27 +82,27 @@
     "bikes": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the bike",
                 "provider": "word"
             },
             "model": {
-                "type": "VARCHAR(100) NOT NULL",
+                "type": "VARCHAR(100) NOT NULL, -- Model name of the bike",
                 "provider": "word"
             },
             "type_id": {
-                "type": "INT REFERENCES bike_types(id)",
+                "type": "INT REFERENCES bike_types(id), -- Foreign key referencing the bike type",
                 "provider": "word"
             },
             "location_id": {
-                "type": "INT REFERENCES locations(id)",
+                "type": "INT REFERENCES locations(id), -- Foreign key indicating the current location of the bike",
                 "provider": "word"
             },
             "status": {
-                "type": "VARCHAR(20) NOT NULL DEFAULT 'available'",
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'available', -- Status of the bike (e.g., available, rented, maintenance)",
                 "provider": "word"
             },
             "daily_price": {
-                "type": "NUMERIC(10, 2) NOT NULL",
+                "type": "NUMERIC(10, 2) NOT NULL -- Rental price per day for the bike",
                 "provider": "pyfloat"
             }
         }
@@ -110,43 +110,43 @@
     "rentals": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the rental transaction",
                 "provider": "word"
             },
             "client_id": {
-                "type": "INT REFERENCES clients(id)",
+                "type": "INT REFERENCES clients(id), -- Foreign key referencing the renting client",
                 "provider": "word"
             },
             "bike_id": {
-                "type": "INT REFERENCES bikes(id)",
+                "type": "INT REFERENCES bikes(id), -- Foreign key referencing the rented bike",
                 "provider": "word"
             },
             "rental_start": {
-                "type": "TIMESTAMP NOT NULL",
+                "type": "TIMESTAMP NOT NULL, -- Timestamp when the rental started",
                 "provider": "word"
             },
             "rental_end": {
-                "type": "TIMESTAMP ",
+                "type": "TIMESTAMP, -- Timestamp when the rental ended (nullable for ongoing rentals)",
                 "provider": "word"
             },
             "total_price": {
-                "type": "NUMERIC(10, 2)",
+                "type": "NUMERIC(10, 2), -- Total price charged for the rental",
                 "provider": "pyfloat"
             },
             "location_pickup_id": {
-                "type": "INT REFERENCES locations(id)",
+                "type": "INT REFERENCES locations(id), -- Foreign key indicating the pickup location",
                 "provider": "word"
             },
             "location_dropoff_id": {
-                "type": "INT REFERENCES locations(id)",
+                "type": "INT REFERENCES locations(id), -- Foreign key indicating the drop-off location",
                 "provider": "word"
             },
             "discount_id": {
-                "type": "INT REFERENCES discounts(id)",
+                "type": "INT REFERENCES discounts(id), -- Foreign key referencing any applied discount",
                 "provider": "word"
             },
             "status": {
-                "type": "VARCHAR(20) NOT NULL DEFAULT 'active'",
+                "type": "VARCHAR(20) NOT NULL DEFAULT 'active' -- Status of the rental (e.g., active, completed, cancelled)",
                 "provider": "word"
             }
         }
@@ -154,19 +154,19 @@
     "maintenance_logs": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the maintenance log entry",
                 "provider": "word"
             },
             "bike_id": {
-                "type": "INT REFERENCES bikes(id)",
+                "type": "INT REFERENCES bikes(id), -- Foreign key referencing the bike that was serviced",
                 "provider": "word"
             },
             "description": {
-                "type": "TEXT NOT NULL",
+                "type": "TEXT NOT NULL, -- Description of the maintenance work performed",
                 "provider": "word"
             },
             "maintenance_date": {
-                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp when maintenance was performed",
                 "provider": "date_time_this_year"
             }
         }
@@ -174,15 +174,15 @@
     "bike_accessories": {
         "columns": {
             "id": {
-                "type": "SERIAL PRIMARY KEY",
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the accessory",
                 "provider": "word"
             },
             "name": {
-                "type": "VARCHAR(100) NOT NULL",
+                "type": "VARCHAR(100) NOT NULL, -- Name of the accessory (e.g., helmet, child seat)",
                 "provider": "word"
             },
             "daily_price": {
-                "type": "NUMERIC(10, 2)",
+                "type": "NUMERIC(10, 2) -- Rental price per day for the accessory",
                 "provider": "pyfloat"
             }
         }
@@ -190,15 +190,15 @@
     "rental_accessories": {
         "columns": {
             "rental_id": {
-                "type": "INT REFERENCES rentals(id)",
+                "type": "INT REFERENCES rentals(id), -- Foreign key referencing the rental transaction",
                 "provider": "word"
             },
             "accessory_id": {
-                "type": "INT REFERENCES bike_accessories(id)",
+                "type": "INT REFERENCES bike_accessories(id), -- Foreign key referencing the accessory",
                 "provider": "word"
             },
             "quantity": {
-                "type": "INT DEFAULT 1",
+                "type": "INT DEFAULT 1, -- Number of units of this accessory rented",
                 "provider": "word"
             }
         }

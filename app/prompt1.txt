@@ -23,13 +23,13 @@ if Column represents an entity which could be generated using faker's standard p
 - For `url` or `link`: url  
 - For `uuid`: uuid4  
 - For `boolean` or `is_...`: pybool
-Remember in case of provider, do not return a list only a single string, do not put any providers other then those listed above!(model is not a provider!)
+Remember in case of provider, do not return a list only a single string, do not put any providers other then those listed above!(model is not a provider!!!)
 In case of numeric values please remember to take value range into account (value range would be specified by column, check, datatype) something like this:
 pyfloat(min_value=x, max_value=y)
 where x, y are floats
 is very nice and acceptable! Remember to adjust range accordingly!!
 else if there is no standard provider return a csv list of possible values containing ${number_of_records} elements, remember about the total number of records requested.
-
+If comment is present it could provide context about what this database column is modeling.
 Examples:
 
 For this input: 
@@ -42,11 +42,16 @@ percentage NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100)
 This is an example of a good response:
 pyfloat(min_value=0, max_value=100)
 
+For input sucha as:
+daily_price NUMERIC(10, 2)
+Remember to return a provider which would provide a valid float!!! Example:
+pyfloat(min_value=0,  max_value=9999999.99)
+
 Remember providers are to be returned as a string not a list something like this: "pyfloat(min_value=0, max_value=100)" should be returned as a single string!!!
 
 Do not return any other text at the beggining only provider or a list, something like here is incorrect "'csv list containing 20 elements:'" or not "generating key values"!!!
 Please remember about the constraints, if you get something like: "status VARCHAR(20) NOT NULL DEFAULT 'available'" remember that the provided
 text cannot be longer than 20 characters
 
-Do not begin the list with, a "csv list containing 20 elements", just put the first element at the beginning
+Do not begin the list with, a "csv list containing X elements", just put the first element at the beginning
 

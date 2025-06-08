@@ -15,26 +15,26 @@ def read_schema(filename):
     return schema
 
 def split_line(s):
+    lines = s.splitlines()
     parts = []
-    current = []
-    depth = 0
 
-    for char in s:
-        if char == '(':
-            depth += 1
-        elif char == ')':
-            depth -= 1
-        if char == ',' and depth == 0:
-            parts.append(''.join(current).strip())
-            current = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        if stripped.startswith("--"):
+            # doklej komentarz do poprzedniej kolumny
+            if parts:
+                parts[-1] += " " + stripped
+            continue
+
+        if stripped.endswith(","):
+            parts.append(stripped.rstrip(",").strip())
         else:
-            current.append(char)
-
-    if current:
-        parts.append(''.join(current).strip())
+            parts.append(stripped.strip())
 
     return parts
-
 def extract_columns(token_list):
     columns = {}
     for token in token_list:
