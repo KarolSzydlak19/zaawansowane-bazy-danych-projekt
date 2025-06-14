@@ -44,14 +44,18 @@ def extract_columns(token_list):
             for line in lines:
                 parts = line.split()
                 if len(parts) >= 2 and not parts[0].upper() in ('PRIMARY', 'FOREIGN', 'CONSTRAINT'):
-                    col_name = parts[0]
-                    col_type = parts[1].upper()
-                    constraint = parts[2:]
+                    if parts[0].upper() == 'UNIQUE':
+                        continue
+                    else:
+                        col_name = parts[0]
+                        col_type = parts[1].upper()
+                        constraint = parts[2:]
                     column_data = col_type + ' ' + " ".join(constraint)
                     provider = guess_provider(col_name)
                     #columns.append({"name": col_name, "type": column_data, "provider": provider})
                     columns[col_name] = {
                         "type" : column_data,
+                        "values" : [],
                         "provider": provider
                     }
     return columns
@@ -186,9 +190,9 @@ def guess_provider(column_name):
         return "pyfloat"
     return "word"
             
-parsed_schema = parse_schema("../init.sql")
-with open("parsed_schema.json", "w") as f:
-    json.dump(parsed_schema, f, indent=4)
+#parsed_schema = parse_schema("../init.sql")
+#with open("parsed_schema.json", "w") as f:
+#    json.dump(parsed_schema, f, indent=4)
 
 #print_generation_order_with_dependencies(parsed_schema)
 #dependency_graph = build_dependency_graph(parsed_schema)

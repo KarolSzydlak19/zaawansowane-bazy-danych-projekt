@@ -13,17 +13,19 @@ import csv
 from io import StringIO
 from sqlalchemy import text
 
-engine = create_engine("postgresql+psycopg2://postgres:password@localhost:5433/testdb")
+
 
 fake = Faker('pl_PL')
 
 class data_generator():
-    def __init__(self, ROWS_PER_TABLE, schema, entries_per_column):
+    def __init__(self, ROWS_PER_TABLE, schema, entries_per_column, engine):
         self.ROWS_PER_TABLE = ROWS_PER_TABLE
         self.data_configuration = None
+        self.schema_sql = schema
         self.schema = sql_parser.parse_schema(schema)
         self.fake = fake
         self.oai_client = oai_client(entries_per_column)
+        self.engine = engine
         
     def get_schema(self, filename):
         with open(filename, "r")as f:
@@ -81,14 +83,46 @@ class data_generator():
 
             for _ in range(self.ROWS_PER_TABLE):
                 values = []
-                cols = [col_name for col_name, col_data in columns_dict.items() if "SERIAL" not in col_data.get("type")]
+                cols = [col_name for col_name, col_data in columns_dict.items() if "SERIAL" not in col_data.get("type") and 'PRIMARY KEY' not in col_data.get("type")]
+                if len(cols) == 0:
+                    continue
                 for col_name in cols:
                     col_type = columns_dict[col_name].get("type")
                     ref = sql_parser.extract_references(col_type)
                     if ref is not None:
-                        #reference assumed to be singular foreign key, with no modification
                         rand_ref = random.randint(0, self.ROWS_PER_TABLE)
-                        val = f"(SELECT id FROM {ref[0]} ORDER BY RANDOM() LIMIT 1)"
+                        table_name_to_check = ref[0].lower() 
+                        schema_name = 'public'
+                        query = f"""
+SELECT
+    kcu.column_name
+FROM
+    information_schema.table_constraints AS tc
+JOIN
+    information_schema.key_column_usage AS kcu
+ON
+    tc.constraint_name = kcu.constraint_name
+    AND tc.table_schema = kcu.table_schema
+    AND tc.table_name = kcu.table_name
+WHERE
+    tc.constraint_type = 'PRIMARY KEY'
+    AND tc.table_schema = '{schema_name}'
+    AND tc.table_name = '{table_name_to_check}';
+"""
+
+                        key_col = None
+                        with self.engine.connect() as con:
+                            try:
+                                result = con.execute(text(query))
+                                key_col = result.fetchone() 
+
+                            except Exception as e:
+                                print(f"Error executing query: {e}")
+                                continue 
+
+                            if key_col:
+                                pk_column_name = key_col[0]
+                        val = f"(SELECT {pk_column_name} FROM {ref[0]} ORDER BY RANDOM() LIMIT 1)"
                     else:
                         val_dict = self.schema[table_name].get("columns", {})[col_name]["values"]
                         provider = self.schema[table_name].get("columns", {})[col_name]["provider"]
@@ -96,11 +130,14 @@ class data_generator():
                         if val_dict:
                             raw_val = random.choice(val_dict)
                         #elif isinstance(val_dict, str):
-                        else:
+                        elif provider is not None:
                             #raw_val = str(getattr(self.fake, val_dict)())
                             parsed = parse_provider_string(provider)
                             provider_name = parsed.pop("provider")
-                            provider_func = getattr(self.fake, provider_name)
+                            try:
+                                provider_func = getattr(self.fake, provider_name)
+                            except Exception as e:
+                                continue
                             raw_val = str(provider_func(**parsed))
                         if isinstance(raw_val, str):
                             # Escape single quotes and wrap in single quotes
@@ -113,9 +150,8 @@ class data_generator():
                 values_str = ", ".join(values)
                 sql = f"INSERT INTO {table_name} ({col_names_str}) VALUES ({values_str});"
                 statements.append(sql)
-
         BATCH_SIZE = self.ROWS_PER_TABLE
-        with engine.connect() as connection:
+        with self.engine.connect() as connection:
             trans = connection.begin()
             for i, stmt in enumerate(statements):
                 try:
@@ -124,8 +160,8 @@ class data_generator():
                         trans.commit()
                         trans = connection.begin()
                 except Exception as e:
-                    print("Error:", e)
-                    print("Query:", stmt)
+                    #print("Error:", e)
+                    #print("Query:", stmt)
                     trans.rollback()
                     trans = connection.begin()
             if trans.is_active:
@@ -135,7 +171,7 @@ class data_generator():
                 f.write(f"{s}\n")
 
     async def gen_oai(self, max_retries):
-        init_schema = self.read_schema("../init.sql")
+        init_schema = self.read_schema(self.schema_sql)
         statements = sqlparse.split(init_schema)
         for stmt in statements:
             retries = 0
@@ -181,9 +217,9 @@ class data_generator():
                             jcolumns[col_name]["values"] = rows[0]
                         retries = max_retries
                 except Exception as e:
-                    print(f"Error calling OpenAI: {e}")
+                    #print(f"Error calling OpenAI: {e}")
                     retries += 1
-        with open("parsed_schema1.json", "w") as f:
+        with open("data_source.json", "w") as f:
             json.dump(self.schema, f, indent=4)
 
 import ast

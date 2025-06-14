@@ -1,383 +1,121 @@
 {
-    "locations": {
+    "Movie": {
         "columns": {
-            "id": {
-                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the location",
-                "provider": null
+            "movie_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each movie",
+                "provider": "word"
             },
-            "city": {
-                "type": "VARCHAR(100) NOT NULL, -- Name of the city where the location is",
-                "provider": "city",
-                "values": null
+            "title": {
+                "type": "VARCHAR(255) NOT NULL, -- Title of the movie (cannot be null)",
+                "provider": "word"
             },
-            "address": {
-                "type": "TEXT NOT NULL -- Specific street address of the location",
-                "provider": "street_address",
-                "values": null
+            "duration": {
+                "type": "INT NOT NULL CHECK (duration BETWEEN 30 AND 240), -- Duration of the movie (must be between 30 and 240 minutes)",
+                "provider": "word"
+            },
+            "director": {
+                "type": "VARCHAR(255), -- Director of the movie (optional)",
+                "provider": "word"
+            },
+            "year_of_making": {
+                "type": "INT CHECK (year_of_making >= 1888), -- Year the movie was made (must be 1888 or later)",
+                "provider": "word"
+            },
+            "age_limit": {
+                "type": "INT CHECK (age_limit IN (7, 10, 13, 18)) -- Age limit for the movie (can only be one of the predefined values)",
+                "provider": "word"
             }
         }
     },
-    "clients": {
+    "Theaters": {
         "columns": {
-            "id": {
-                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the client",
-                "provider": null
-            },
-            "full_name": {
-                "type": "VARCHAR(100) NOT NULL, -- Full name of the client",
-                "provider": "name",
-                "values": null
-            },
-            "email": {
-                "type": "VARCHAR(100) UNIQUE NOT NULL, -- Email address of the client",
-                "provider": "email",
-                "values": null
-            },
-            "phone": {
-                "type": "VARCHAR(20), -- Phone number of the client",
-                "provider": "phone_number",
-                "values": null
-            },
-            "created_at": {
-                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of when the client was registered",
-                "provider": "date_time",
-                "values": null
-            }
-        }
-    },
-    "bike_types": {
-        "columns": {
-            "id": {
-                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the bike type",
-                "provider": null
+            "theater_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each theater",
+                "provider": "word"
             },
             "name": {
-                "type": "VARCHAR(50) NOT NULL -- Name of the bike type (e.g., mountain, road, electric)",
-                "provider": "first_name",
-                "values": null
+                "type": "VARCHAR(100) UNIQUE NOT NULL, -- Name of the theater (must be unique and not null)",
+                "provider": "word"
+            },
+            "capacity": {
+                "type": "INT NOT NULL CHECK (capacity > 0) -- Theater capacity (must be a positive number)",
+                "provider": "city"
             }
         }
     },
-    "discounts": {
+    "Seats": {
         "columns": {
-            "id": {
-                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the discount",
-                "provider": null
+            "seat_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each seat",
+                "provider": "word"
             },
-            "name": {
-                "type": "VARCHAR(100) NOT NULL, -- Name of the discount (e.g., \"Summer Promo\")",
-                "provider": null,
-                "values": [
-                    "Summer Promo",
-                    "Winter Deal",
-                    "Black Friday Sale",
-                    "Holiday Discount",
-                    "New Year Offer",
-                    "Spring Savings",
-                    "Autumn Promotion",
-                    "Exclusive Deal",
-                    "Mega Sale",
-                    "Clearance",
-                    "Limited Offer",
-                    "Special Offer",
-                    "Flash Sale",
-                    "Big Discount",
-                    "Weekend Deal",
-                    "Member Discount",
-                    "Early Bird Offer",
-                    "Last Minute Deal",
-                    "Special Reduction",
-                    "Seasonal Sale",
-                    "Daily Deal",
-                    "Holiday Special",
-                    "Super Savings",
-                    "VIP Discount",
-                    "Best Price",
-                    "Early Access",
-                    "Limited Time Offer",
-                    "Exclusive Savings",
-                    "Members Only",
-                    "Fast Deal",
-                    "Special Event",
-                    "Hot Offer",
-                    "Reward Bonus",
-                    "Cashback Deal",
-                    "Price Drop",
-                    "Deal of the Day",
-                    "New Arrival Promotion",
-                    "Early Bird Discount",
-                    "Seasonal Offer",
-                    "Special Sale",
-                    "Limited Discount",
-                    "Top Deal",
-                    "Clearance Sale",
-                    "Special Price"
-                ]
+            "theater_id": {
+                "type": "INT NOT NULL REFERENCES Theaters(theater_id) ON DELETE CASCADE, -- Foreign key to Theaters table (if the theater is deleted, its seats will be deleted too)",
+                "provider": "word"
             },
-            "description": {
-                "type": "TEXT, -- Detailed description of the discount",
-                "provider": "paragraph",
-                "values": null
+            "row_number": {
+                "type": "INT NOT NULL, -- Row number for the seat",
+                "provider": "word"
             },
-            "percentage": {
-                "type": "NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100), -- Discount percentage (0\u00e2\u20ac\u201c100%)",
-                "provider": "pyfloat(min_value=0,  max_value=100)",
-                "values": null
+            "seat_number": {
+                "type": "INT NOT NULL, -- Seat number within the row",
+                "provider": "word"
             },
-            "valid_from": {
-                "type": "DATE, -- Start date when the discount is valid",
-                "provider": "date",
-                "values": null
+            "is_handicap": {
+                "type": "BOOLEAN DEFAULT FALSE, -- Whether the seat is a handicap-accessible seat (default is FALSE)",
+                "provider": "word"
             },
-            "valid_to": {
-                "type": "DATE -- End date when the discount expires",
-                "provider": "date",
-                "values": null
+            "UNIQUE": {
+                "type": "(THEATER_ID, row_number, seat_number) -- Ensure that each seat in a specific row and theater is unique",
+                "provider": "word"
             }
         }
     },
-    "bikes": {
+    "Schedule": {
         "columns": {
-            "id": {
-                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the bike",
-                "provider": null
+            "schedule_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each schedule entry",
+                "provider": "word"
             },
-            "model": {
-                "type": "VARCHAR(100) NOT NULL, -- Model name of the bike",
-                "provider": null,
-                "values": [
-                    "model",
-                    "model_name",
-                    "model_type",
-                    "model_code",
-                    "model_variant",
-                    "model_number",
-                    "model_id",
-                    "model_label",
-                    "model classification",
-                    "model designation",
-                    "model design"
-                ]
+            "theater_id": {
+                "type": "INT NOT NULL REFERENCES Theaters(theater_id), -- Foreign key to Theaters table",
+                "provider": "word"
             },
-            "type_id": {
-                "type": "INT REFERENCES bike_types(id), -- Foreign key referencing the bike type",
-                "provider": null
+            "movie_id": {
+                "type": "INT NOT NULL REFERENCES Movie(movie_id), -- Foreign key to Movie table",
+                "provider": "word"
             },
-            "location_id": {
-                "type": "INT REFERENCES locations(id), -- Foreign key indicating the current location of the bike",
-                "provider": null
+            "show_date": {
+                "type": "DATE NOT NULL, -- Date of the movie showing",
+                "provider": "date_time_this_year"
             },
-            "status": {
-                "type": "VARCHAR(20) NOT NULL DEFAULT 'available', -- Status of the bike (e.g., available, rented, maintenance)",
-                "provider": null,
-                "values": [
-                    "available",
-                    " rented",
-                    " maintenance",
-                    " unavailable",
-                    " reserved",
-                    " in_service",
-                    " out_of_order",
-                    " pending",
-                    " sold",
-                    " returned",
-                    " on_hold",
-                    " cleaning",
-                    " inspection",
-                    " repaired",
-                    " lost",
-                    " damaged",
-                    " stolen",
-                    " refurbished",
-                    " withdrawn",
-                    " scheduled",
-                    " active",
-                    " inactive",
-                    " in_use",
-                    " reserved_for_use",
-                    " offsite",
-                    " on_site",
-                    " under_review",
-                    " pending_repair",
-                    " ready"
-                ]
-            },
-            "daily_price": {
-                "type": "NUMERIC(10, 2) NOT NULL -- Rental price per day for the bike",
-                "provider": "pyfloat(min_value=0,  max_value=9999999.99)",
-                "values": null
+            "show_time": {
+                "type": "TIME NOT NULL -- Time of the movie showing",
+                "provider": "word"
             }
         }
     },
-    "rentals": {
+    "Tickets": {
         "columns": {
-            "id": {
-                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the rental transaction",
-                "provider": null
+            "ticket_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each ticket",
+                "provider": "word"
             },
-            "client_id": {
-                "type": "INT REFERENCES clients(id), -- Foreign key referencing the renting client",
-                "provider": null
+            "schedule_id": {
+                "type": "INT NOT NULL REFERENCES Schedule(schedule_id) ON DELETE CASCADE, -- Foreign key to Schedule table (if a schedule is deleted, its tickets will be deleted too)",
+                "provider": "word"
             },
-            "bike_id": {
-                "type": "INT REFERENCES bikes(id), -- Foreign key referencing the rented bike",
-                "provider": null
+            "seat_id": {
+                "type": "INT NOT NULL REFERENCES Seats(seat_id), -- Foreign key to Seats table",
+                "provider": "word"
             },
-            "rental_start": {
-                "type": "TIMESTAMP NOT NULL, -- Timestamp when the rental started",
-                "provider": "date_time",
-                "values": null
+            "price": {
+                "type": "NUMERIC(6, 2) NOT NULL CHECK (price > 0), -- Price of the ticket (must be greater than 0)",
+                "provider": "pyfloat"
             },
-            "rental_end": {
-                "type": "TIMESTAMP, -- Timestamp when the rental ended (nullable for ongoing rentals)",
-                "provider": "date_time",
-                "values": null
-            },
-            "total_price": {
-                "type": "NUMERIC(10, 2), -- Total price charged for the rental",
-                "provider": "pyfloat(min_value=0,  max_value=9999999.99)",
-                "values": null
-            },
-            "location_pickup_id": {
-                "type": "INT REFERENCES locations(id), -- Foreign key indicating the pickup location",
-                "provider": null
-            },
-            "location_dropoff_id": {
-                "type": "INT REFERENCES locations(id), -- Foreign key indicating the drop-off location",
-                "provider": null
-            },
-            "discount_id": {
-                "type": "INT REFERENCES discounts(id), -- Foreign key referencing any applied discount",
-                "provider": null
-            },
-            "status": {
-                "type": "VARCHAR(20) NOT NULL DEFAULT 'active' -- Status of the rental (e.g., active, completed, cancelled)",
-                "provider": null,
-                "values": [
-                    "active",
-                    "completed",
-                    "cancelled",
-                    "pending",
-                    "failed",
-                    "refunded",
-                    "processing",
-                    "shipped",
-                    "delivered",
-                    "returned",
-                    "cancelled_by_user",
-                    "expired",
-                    "approved",
-                    "rejected",
-                    "pending_payment",
-                    "confirmed",
-                    "disputed",
-                    "completed_with_issues",
-                    "scheduled",
-                    "parked"
-                ]
-            }
-        }
-    },
-    "maintenance_logs": {
-        "columns": {
-            "id": {
-                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the maintenance log entry",
-                "provider": null
-            },
-            "bike_id": {
-                "type": "INT REFERENCES bikes(id), -- Foreign key referencing the bike that was serviced",
-                "provider": null
-            },
-            "description": {
-                "type": "TEXT NOT NULL, -- Description of the maintenance work performed",
-                "provider": null,
-                "values": [
-                    "csv list containing 50 elements: Repair",
-                    "Replacement",
-                    "Inspection",
-                    "Testing",
-                    "Calibration",
-                    "Cleaning",
-                    "Adjustment",
-                    "Upgrade",
-                    "Modification",
-                    "Installation",
-                    "Removal",
-                    "Rejection",
-                    "Verification",
-                    "Documentation",
-                    "Analysis",
-                    "Calibration",
-                    "Calibration",
-                    "Repair",
-                    "Replacement",
-                    "Testing",
-                    "Inspection",
-                    "Upgrade",
-                    "Adjustment",
-                    "Cleaning",
-                    "Modification",
-                    "Installation",
-                    "Removal",
-                    "Verification",
-                    "Documentation",
-                    "Repair",
-                    "Calibration",
-                    "Testing",
-                    "Adjustment",
-                    "Cleaning",
-                    "Upgrade",
-                    "Modification",
-                    "Installation",
-                    "Removal",
-                    "Verification",
-                    "Repair",
-                    "Replacement",
-                    "Inspection",
-                    "Testing",
-                    "Calibration",
-                    "Documentation"
-                ]
-            },
-            "maintenance_date": {
-                "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp when maintenance was performed",
-                "provider": "date_time",
-                "values": null
-            }
-        }
-    },
-    "bike_accessories": {
-        "columns": {
-            "id": {
-                "type": "SERIAL PRIMARY KEY, -- Unique identifier for the accessory",
-                "provider": null
-            },
-            "name": {
-                "type": "VARCHAR(100) NOT NULL, -- Name of the accessory (e.g., helmet, child seat)",
-                "provider": "first_name",
-                "values": null
-            },
-            "daily_price": {
-                "type": "NUMERIC(10, 2) -- Rental price per day for the accessory",
-                "provider": "pyfloat(min_value=0,  max_value=9999999.99)",
-                "values": null
-            }
-        }
-    },
-    "rental_accessories": {
-        "columns": {
-            "rental_id": {
-                "type": "INT REFERENCES rentals(id), -- Foreign key referencing the rental transaction",
-                "provider": null
-            },
-            "accessory_id": {
-                "type": "INT REFERENCES bike_accessories(id), -- Foreign key referencing the accessory",
-                "provider": null
-            },
-            "quantity": {
-                "type": "INT DEFAULT 1, -- Number of units of this accessory rented",
-                "provider": "pyint(min_value=1)",
-                "values": null
+            "UNIQUE": {
+                "type": "(SCHEDULE_ID, seat_id) -- Ensure that each ticket is unique for a specific schedule and seat",
+                "provider": "word"
             }
         }
     }

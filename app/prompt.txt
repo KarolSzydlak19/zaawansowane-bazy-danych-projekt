@@ -24,6 +24,7 @@ if Column represents an entity which could be generated using faker's standard p
 - For `uuid`: uuid4  
 - For `boolean` or `is_...`: pybool  
 - For `text`, `description`, or similar: text
+- For `time`, `time`
 In case of numeric values please remember to take value range into account (value range would be specified by column, check, datatype) something like this:
 pyfloat(min_value=x, max_value=y)
 where x, y are floats

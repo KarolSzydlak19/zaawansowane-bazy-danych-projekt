@@ -7,8 +7,10 @@ import threading
 import sys
 import time
 import requests
+from sqlalchemy import create_engine
 
-
+#engine = create_engine("postgresql+psycopg2://postgres:password@localhost:5433/testdb")
+# postgresql+psycopg2://postgres:password@localhost:5433/cin
 def spinner_task(stop_event):
     spinner = ['|', '/', '-', '\\']
     idx = 0
@@ -40,8 +42,10 @@ def main():
     parser.add_argument('--u', type=int, help='Sample data entries in column')
     parser.add_argument('--size', type=int, help='Datasize')
     parser.add_argument('--schema', type=str,help="SQL init file")
+    parser.add_argument('--db', type=str,help="DB connection string")
     abort = False
     args = parser.parse_args()
+    engine = create_engine(args.db)
 
     if not args.size:
         print("Specifie datasize with --size=N, where N is an integer")
@@ -53,7 +57,7 @@ def main():
     if abort:
         return
     
-    dg = data_generator(args.size, args.schema, args.u)
+    dg = data_generator(args.size, args.schema, args.u, engine)
     data_source_path = "data_source.json"
     if args.u:
         asyncio.run(dg.gen_oai(args.u))

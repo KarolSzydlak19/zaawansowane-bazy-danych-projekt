@@ -23,11 +23,12 @@ if Column represents an entity which could be generated using faker's standard p
 - For `url` or `link`: url  
 - For `uuid`: uuid4  
 - For `boolean` or `is_...`: pybool
+- For `time`, `time`
 Remember in case of provider, do not return a list only a single string, do not put any providers other then those listed above!(model is not a provider!!!)
 In case of numeric values please remember to take value range into account (value range would be specified by column, check, datatype) something like this:
 pyfloat(min_value=x, max_value=y)
 where x, y are floats
-is very nice and acceptable! Remember to adjust range accordingly!!
+is very nice and acceptable! Remember to adjust range accordingly!! When returning provider please do not return more than one, it is not acceptable, do not usee non ascii characters!!
 else if there is no standard provider return a csv list of possible values containing ${number_of_records} elements, remember about the total number of records requested.
 If comment is present it could provide context about what this database column is modeling.
 Examples:
@@ -54,4 +55,5 @@ Please remember about the constraints, if you get something like: "status VARCHA
 text cannot be longer than 20 characters
 
 Do not begin the list with, a "csv list containing X elements", just put the first element at the beginning
+Remember wht you return is later inserted either into the datasource or code itself
 
