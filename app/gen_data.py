@@ -149,18 +149,44 @@ WHERE
                 statements.append(sql)
         BATCH_SIZE = self.ROWS_PER_TABLE
         with self.engine.connect() as connection:
-            trans = connection.begin()
+            statements_in_batch = []
             for i, stmt in enumerate(statements):
-                try:
-                    connection.execute(text(stmt))
-                    if (i + 1) % BATCH_SIZE == 0:
-                        trans.commit()
+                statements_in_batch.append(stmt)
+                
+                is_batch_ready = (i + 1) % BATCH_SIZE == 0 or (i + 1) == len(statements)
+                if is_batch_ready:
+                    retry_batch = statements_in_batch.copy()
+                    
+                    while retry_batch:
                         trans = connection.begin()
-                except Exception as e:
-                    trans.rollback()
-                    trans = connection.begin()
-            if trans.is_active:
-                trans.commit()
+                        failed_stmt = None
+                        for s in retry_batch:
+                            try:
+                                connection.execute(s)
+                            except Exception as e:
+                                failed_stmt = s
+                                break
+                        if failed_stmt:
+                            trans.rollback()
+                            retry_batch.remove(failed_stmt)
+                        else:
+                            trans.commit()
+                            statements_in_batch = []
+                            retry_batch = []
+                            break
+                        
+#            trans = connection.begin()
+#            for i, stmt in enumerate(statements):
+#                try:
+#                    connection.execute(text(stmt))
+#                    if (i + 1) % BATCH_SIZE == 0:
+#                        trans.commit()
+#                        trans = connection.begin()
+#                except Exception as e:
+#                    trans.rollback()
+#                    trans = connection.begin()
+#            if trans.is_active:
+#                trans.commit()
         with open(filename, "w") as f:
             for s in statements:
                 f.write(f"{s}\n")
