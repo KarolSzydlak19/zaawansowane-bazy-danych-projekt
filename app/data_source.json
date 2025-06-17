@@ -1,0 +1,144 @@
+{
+    "Movie": {
+        "columns": {
+            "movie_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each movie",
+                "values": [],
+                "provider": null
+            },
+            "title": {
+                "type": "VARCHAR(255) NOT NULL, -- Title of the movie (cannot be null)",
+                "values": [
+                    "Drama,Action,Comedy,Thriller,Horror,Romance,Science Fiction,Documentary,Animation,Adventure,Fantasy,Musical,Mystery,Crime,Family,History,War,Western,Biography,Music,War,Superhero,Disaster, tidspunkt,Film Noir,Experimental,Anthology,Foreign,Short,Indie,Teen,Slasher,Silent,Anime,Anime,Mockumentary,Parody,Reality,Spaghetti Western,Screenplay,Television"
+                ],
+                "provider": null
+            },
+            "duration": {
+                "type": "INT NOT NULL CHECK (duration BETWEEN 30 AND 240), -- Duration of the movie (must be between 30 and 240 minutes)",
+                "values": null,
+                "provider": "pyint(min_value=30,  max_value=240)"
+            },
+            "director": {
+                "type": "VARCHAR(255), -- Director of the movie (optional)",
+                "values": null,
+                "provider": "first_name, last_name"
+            },
+            "year_of_making": {
+                "type": "INT CHECK (year_of_making >= 1888), -- Year the movie was made (must be 1888 or later)",
+                "values": null,
+                "provider": "pyint(min_value=1888,  max_value=2023)"
+            },
+            "age_limit": {
+                "type": "INT CHECK (age_limit IN (7, 10, 13, 18)) -- Age limit for the movie (can only be one of the predefined values)",
+                "values": [
+                    "7",
+                    " 10",
+                    " 13",
+                    " 18"
+                ],
+                "provider": null
+            }
+        }
+    },
+    "Theaters": {
+        "columns": {
+            "theater_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each theater, it is a name of a place not a person",
+                "values": [],
+                "provider": null
+            },
+            "name": {
+                "type": "VARCHAR(100) UNIQUE NOT NULL, -- Name of the theater (must be unique and not null)",
+                "values": null,
+                "provider": "first_name"
+            },
+            "capacity": {
+                "type": "INT NOT NULL CHECK (capacity > 0) -- Theater capacity (must be a positive number)",
+                "values": null,
+                "provider": "pyint(min_value=1)"
+            }
+        }
+    },
+    "Seats": {
+        "columns": {
+            "seat_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each seat",
+                "values": [],
+                "provider": null
+            },
+            "theater_id": {
+                "type": "INT NOT NULL REFERENCES Theaters(theater_id) ON DELETE CASCADE, -- Foreign key to Theaters table (if the theater is deleted, its seats will be deleted too)",
+                "values": [],
+                "provider": null
+            },
+            "row_number": {
+                "type": "INT NOT NULL, -- Row number for the seat",
+                "values": null,
+                "provider": "pyint"
+            },
+            "seat_number": {
+                "type": "INT NOT NULL, -- Seat number within the row, an INTEGER",
+                "values": null,
+                "provider": "pyint"
+            },
+            "is_handicap": {
+                "type": "BOOLEAN DEFAULT FALSE, -- Whether the seat is a handicap-accessible seat (default is FALSE)",
+                "values": null,
+                "provider": "pybool"
+            }
+        }
+    },
+    "Schedule": {
+        "columns": {
+            "schedule_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each schedule entry",
+                "values": [],
+                "provider": null
+            },
+            "theater_id": {
+                "type": "INT NOT NULL REFERENCES Theaters(theater_id), -- Foreign key to Theaters table",
+                "values": [],
+                "provider": null
+            },
+            "movie_id": {
+                "type": "INT NOT NULL REFERENCES Movie(movie_id), -- Foreign key to Movie table",
+                "values": [],
+                "provider": null
+            },
+            "show_date": {
+                "type": "DATE NOT NULL, -- Date of the movie showing",
+                "values": null,
+                "provider": "date"
+            },
+            "show_time": {
+                "type": "TIME NOT NULL -- Time of the movie showing",
+                "values": null,
+                "provider": "time"
+            }
+        }
+    },
+    "Tickets": {
+        "columns": {
+            "ticket_id": {
+                "type": "SERIAL PRIMARY KEY, -- Unique identifier for each ticket",
+                "values": [],
+                "provider": null
+            },
+            "schedule_id": {
+                "type": "INT NOT NULL REFERENCES Schedule(schedule_id) ON DELETE CASCADE, -- Foreign key to Schedule table (if a schedule is deleted, its tickets will be deleted too)",
+                "values": [],
+                "provider": null
+            },
+            "seat_id": {
+                "type": "INT NOT NULL REFERENCES Seats(seat_id), -- Foreign key to Seats table",
+                "values": [],
+                "provider": null
+            },
+            "price": {
+                "type": "NUMERIC(6, 2) NOT NULL CHECK (price > 0), -- Price of the ticket (must be greater than 0)",
+                "values": null,
+                "provider": "pyfloat(min_value=0.01,  max_value=9999.99)"
+            }
+        }
+    }
+}
