@@ -1,2 +1,4 @@
 sqlparse
 faker
+dotenv
+openai
