@@ -1,6 +1,6 @@
 <|system|>
-You will assist in application which is supposed to generate data for PostgreSQL database. You will  be provided a table description, what you need
-to do is to return a json dictionary, where for each non-key column you will provide:
+You will assist in application which is supposed to generate data for PostgreSQL database. You will  be provided a column description (SQL code, PostgreSQL), what you need
+to do is to return an faker provider name or an csv list, where for each non-key column you will provide:
 if Column represents an entity which could be generated using faker's standard provider you will generate the poviders name accordingly:
 - For `float`: pyfloat  
 - For `integer` or `int`: pyint  
@@ -22,30 +22,38 @@ if Column represents an entity which could be generated using faker's standard p
 - For `datetime`: date_time  
 - For `url` or `link`: url  
 - For `uuid`: uuid4  
-- For `boolean` or `is_...`: pybool  
-- For `text`, `description`, or similar: text
+- For `boolean` or `is_...`: pybool
 - For `time`, `time`
+Remember in case of provider, do not return a list only a single string, do not put any providers other then those listed above!(model is not a provider!!!)
 In case of numeric values please remember to take value range into account (value range would be specified by column, check, datatype) something like this:
 pyfloat(min_value=x, max_value=y)
 where x, y are floats
-is very nice and acceptable! Remember to adjust range accordingly!!
-else if there is no standard provider return list of possible values containing ${number_of_records} elements if such number makes sense.
- For this table: 
--- Table: discounts
-CREATE TABLE discounts (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    percentage NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100),
-    valid_from DATE,
-    valid_to DATE
-);
+is very nice and acceptable! Remember to adjust range accordingly!! When returning provider please do not return more than one, it is not acceptable, do not usee non ascii characters!!
+else if there is no standard provider return a csv list of possible values containing ${number_of_records} elements, remember about the total number of records requested.
+If comment is present it could provide context about what this database column is modeling.
+Examples:
+
+For this input: 
+name VARCHAR(100) NOT NULL,
 This is example of a good response (for a list containing 5 elements):
-{
-  "name": ["Summer Sale", "Winter Discount", "Black Friday Deal", "New Year Promotion", "Holiday Special"],
-  "description": ["Discount for summer season", "Winter season discount", "Black Friday special offer", "Promotion for New Year", "Holiday season discount"],
-  "percentage": ,"pyfloat(min_value=0, max_value=100)"
-  "valid_from": "date",
-  "valid_to": "date"
-}
-Respond only with JSON object, no additional text!
+Summer Sale,Winter Discount,Black Friday Deal,New Year Promotion,Holiday Special
+
+For this input:
+percentage NUMERIC(5, 2) NOT NULL CHECK (percentage BETWEEN 0 AND 100)
+This is an example of a good response:
+pyfloat(min_value=0, max_value=100)
+
+For input sucha as:
+daily_price NUMERIC(10, 2)
+Remember to return a provider which would provide a valid float!!! Example:
+pyfloat(min_value=0,  max_value=9999999.99)
+
+Remember providers are to be returned as a string not a list something like this: "pyfloat(min_value=0, max_value=100)" should be returned as a single string!!!
+
+Do not return any other text at the beggining only provider or a list, something like here is incorrect "'csv list containing 20 elements:'" or not "generating key values"!!!
+Please remember about the constraints, if you get something like: "status VARCHAR(20) NOT NULL DEFAULT 'available'" remember that the provided
+text cannot be longer than 20 characters
+
+Do not begin the list with, a "csv list containing X elements", just put the first element at the beginning
+Remember wht you return is later inserted either into the datasource or code itself
+

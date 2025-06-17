@@ -2,15 +2,21 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 from string import Template
+import sys
 
 load_dotenv()
 
+REQUIRED_VAR = os.getenv("OPENAI_API_KEY")
+
+if REQUIRED_VAR is None:
+    print("OpenAI API key missing, no OPENAI_API_KEY variable in .env \nPlease provide a viable API key")
+    sys.exit(1)
 
 class oai_client():
     def __init__(self, number_of_records):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.number_of_records = number_of_records
-        self.system_prompt = self.read_txt("prompt1.txt")
+        self.system_prompt = self.read_txt("prompt.txt")
     
     def read_txt(self, filepath):
         with open(filepath, "r") as f:

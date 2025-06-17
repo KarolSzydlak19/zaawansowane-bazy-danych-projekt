@@ -190,12 +190,4 @@ def guess_provider(column_name):
         return "pyfloat"
     return "word"
             
-#parsed_schema = parse_schema("../init.sql")
-#with open("parsed_schema.json", "w") as f:
-#    json.dump(parsed_schema, f, indent=4)
-
-#print_generation_order_with_dependencies(parsed_schema)
-#dependency_graph = build_dependency_graph(parsed_schema)
-#topological_sort(parsed_schema)
-#print_generation_order_with_dependencies(parsed_schema)
 

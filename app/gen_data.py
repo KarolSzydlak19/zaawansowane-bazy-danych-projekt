@@ -12,6 +12,7 @@ import re
 import csv
 from io import StringIO
 from sqlalchemy import text
+import ast
 
 
 
@@ -215,8 +216,6 @@ WHERE
                     retries += 1
         with open("data_source.json", "w") as f:
             json.dump(self.schema, f, indent=4)
-
-import ast
 
 def parse_provider_string(s: str) -> dict:
     s = s.strip()

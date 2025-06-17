@@ -38,7 +38,6 @@ def main():
 
     start = time.time()
     parser = argparse.ArgumentParser()
-    #parser.add_argument('--u', action='store_true', help='Generate configuration for data generation')
     parser.add_argument('--u', type=int, help='Sample data entries in column')
     parser.add_argument('--size', type=int, help='Datasize')
     parser.add_argument('--schema', type=str,help="SQL init file")
