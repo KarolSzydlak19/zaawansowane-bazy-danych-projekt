@@ -15,26 +15,26 @@ def read_schema(filename):
     return schema
 
 def split_line(s):
-    lines = s.splitlines()
     parts = []
+    current = []
+    depth = 0
 
-    for line in lines:
-        stripped = line.strip()
-        if not stripped:
-            continue
-
-        if stripped.startswith("--"):
-            # doklej komentarz do poprzedniej kolumny
-            if parts:
-                parts[-1] += " " + stripped
-            continue
-
-        if stripped.endswith(","):
-            parts.append(stripped.rstrip(",").strip())
+    for char in s:
+        if char == '(':
+            depth += 1
+        elif char == ')':
+            depth -= 1
+        if char == ',' and depth == 0:
+            parts.append(''.join(current).strip())
+            current = []
         else:
-            parts.append(stripped.strip())
+            current.append(char)
+
+    if current:
+        parts.append(''.join(current).strip())
 
     return parts
+
 def extract_columns(token_list):
     columns = {}
     for token in token_list:
@@ -44,33 +44,16 @@ def extract_columns(token_list):
             for line in lines:
                 parts = line.split()
                 if len(parts) >= 2 and not parts[0].upper() in ('PRIMARY', 'FOREIGN', 'CONSTRAINT'):
-                    if parts[0].upper() == 'UNIQUE':
-                        continue
-                    else:
-                        col_name = parts[0]
-                        col_type = parts[1].upper()
-                        constraint = parts[2:]
+                    col_name = parts[0]
+                    col_type = parts[1].upper()
+                    constraint = parts[2:]
                     column_data = col_type + ' ' + " ".join(constraint)
                     provider = guess_provider(col_name)
                     #columns.append({"name": col_name, "type": column_data, "provider": provider})
                     columns[col_name] = {
                         "type" : column_data,
-                        "values" : [],
                         "provider": provider
                     }
-    return columns
-
-def extract_column_names(token_list):
-    columns = []
-    for token in token_list:
-        if isinstance(token, Parenthesis):
-            inside = token.value[1:-1]
-            lines = split_line(inside) 
-            for line in lines:
-                parts = line.split()
-                if len(parts) >= 2 and not parts[0].upper() in ('PRIMARY', 'FOREIGN', 'CONSTRAINT'):
-                    columns.append(line)
-                    
     return columns
 
 def parse_schema(filename):
@@ -190,12 +173,12 @@ def guess_provider(column_name):
         return "pyfloat"
     return "word"
             
-#parsed_schema = parse_schema("../init.sql")
-#with open("parsed_schema.json", "w") as f:
-#    json.dump(parsed_schema, f, indent=4)
+parsed_schema = parse_schema("../init.sql")
+with open("parsed_schema.json", "w") as f:
+    json.dump(parsed_schema, f, indent=4)
 
 #print_generation_order_with_dependencies(parsed_schema)
 #dependency_graph = build_dependency_graph(parsed_schema)
-#topological_sort(parsed_schema)
-#print_generation_order_with_dependencies(parsed_schema)
+topological_sort(parsed_schema)
+print_generation_order_with_dependencies(parsed_schema)
 
