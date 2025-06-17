@@ -162,7 +162,7 @@ WHERE
                         failed_stmt = None
                         for s in retry_batch:
                             try:
-                                connection.execute(s)
+                                connection.execute(text(s))
                             except Exception as e:
                                 failed_stmt = s
                                 break
