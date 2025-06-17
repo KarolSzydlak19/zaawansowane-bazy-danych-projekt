@@ -126,12 +126,9 @@ WHERE
                     else:
                         val_dict = self.schema[table_name].get("columns", {})[col_name]["values"]
                         provider = self.schema[table_name].get("columns", {})[col_name]["provider"]
-                        #if isinstance(val_dict, list):
                         if val_dict:
                             raw_val = random.choice(val_dict)
-                        #elif isinstance(val_dict, str):
                         elif provider is not None:
-                            #raw_val = str(getattr(self.fake, val_dict)())
                             parsed = parse_provider_string(provider)
                             provider_name = parsed.pop("provider")
                             try:
@@ -140,7 +137,6 @@ WHERE
                                 continue
                             raw_val = str(provider_func(**parsed))
                         if isinstance(raw_val, str):
-                            # Escape single quotes and wrap in single quotes
                             escaped_val = raw_val.replace("'", "''")
                             val = f"'{escaped_val}'"
                         else:
@@ -160,8 +156,6 @@ WHERE
                         trans.commit()
                         trans = connection.begin()
                 except Exception as e:
-                    #print("Error:", e)
-                    #print("Query:", stmt)
                     trans.rollback()
                     trans = connection.begin()
             if trans.is_active:

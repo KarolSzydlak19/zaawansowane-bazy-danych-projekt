@@ -2,3 +2,6 @@ sqlparse
 faker
 dotenv
 openai
+sqlalchemy
+requests
+psycopg2
