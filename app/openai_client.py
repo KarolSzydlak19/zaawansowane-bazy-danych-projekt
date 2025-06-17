@@ -3,8 +3,11 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from string import Template
 import sys
+from pathlib import Path
 
-load_dotenv()
+dotenv_path = Path(__file__).resolve().parent / ".env"
+prompt_path = Path(__file__).resolve().parent / "prompt.txt"
+load_dotenv(dotenv_path)
 
 REQUIRED_VAR = os.getenv("OPENAI_API_KEY")
 
@@ -16,7 +19,7 @@ class oai_client():
     def __init__(self, number_of_records):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.number_of_records = number_of_records
-        self.system_prompt = self.read_txt("prompt.txt")
+        self.system_prompt = self.read_txt(prompt_path)
     
     def read_txt(self, filepath):
         with open(filepath, "r") as f:

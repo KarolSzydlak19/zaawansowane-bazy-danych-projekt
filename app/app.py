@@ -8,7 +8,12 @@ import sys
 import time
 import requests
 from sqlalchemy import create_engine
+from pathlib import Path
 
+try:
+    current_path = Path(__file__).resolve().parent
+except NameError:
+    current_path = Path(os.getcwd())
 #engine = create_engine("postgresql+psycopg2://postgres:password@localhost:5433/testdb")
 # postgresql+psycopg2://postgres:password@localhost:5433/cin
 def spinner_task(stop_event):
@@ -57,7 +62,7 @@ def main():
         return
     
     dg = data_generator(args.size, args.schema, args.u, engine)
-    data_source_path = "data_source.json"
+    data_source_path = current_path / "data_source.json"
     if args.u:
         asyncio.run(dg.gen_oai(args.u))
         dg.save_schema(data_source_path)

@@ -1,7 +1,6 @@
 import json
 from faker import Faker
 import random
-
 import sql_parser
 from openai_client import oai_client
 import sqlparse
@@ -13,7 +12,6 @@ import csv
 from io import StringIO
 from sqlalchemy import text
 import ast
-
 
 
 fake = Faker('pl_PL')
@@ -174,19 +172,6 @@ WHERE
                             statements_in_batch = []
                             retry_batch = []
                             break
-                        
-#            trans = connection.begin()
-#            for i, stmt in enumerate(statements):
-#                try:
-#                    connection.execute(text(stmt))
-#                    if (i + 1) % BATCH_SIZE == 0:
-#                        trans.commit()
-#                        trans = connection.begin()
-#                except Exception as e:
-#                    trans.rollback()
-#                    trans = connection.begin()
-#            if trans.is_active:
-#                trans.commit()
         with open(filename, "w") as f:
             for s in statements:
                 f.write(f"{s}\n")
